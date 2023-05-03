@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
 
-import 'package:flutter/services.dart';
 import 'package:igplayer/view/ig_video_player.dart';
 
 void main() {
@@ -28,7 +26,7 @@ class _MyAppState extends State<MyApp> {
           appBar: AppBar(
             title: const Text('Plugin example app'),
           ),
-          body: IgVideoPlayer(
+          body: const IgVideoPlayer(
               videoUrl:
                   "https://www.shutterstock.com/shutterstock/videos/1068074216/preview/stock-footage-surgeons-use-augmented-reality-vr-glasses-to-investigate-patient-lungs-status-virus-detection-d.webm")),
     );

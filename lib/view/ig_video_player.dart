@@ -31,9 +31,6 @@ class _IgVideoPlayerState extends State<IgVideoPlayer> {
         "url": widget.videoUrl,
       },
       creationParamsCodec: const JSONMessageCodec(),
-      onPlatformViewCreated: (id) => {
-        _onPlatformViewCreated(id),
-      },
     );
   }
 
@@ -44,13 +41,6 @@ class _IgVideoPlayerState extends State<IgVideoPlayer> {
         "videoUrl": widget.videoUrl,
       },
       creationParamsCodec: const JSONMessageCodec(),
-      onPlatformViewCreated: (id) => {
-        _onPlatformViewCreated(id),
-      },
     );
-  }
-
-  _onPlatformViewCreated(viewId) {
-    _methodChannel = const MethodChannel("igzafer/NativeVideoPlayerMethodChannel");
   }
 }
