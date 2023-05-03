@@ -11,8 +11,6 @@ class IgVideoPlayer extends StatefulWidget {
 }
 
 class _IgVideoPlayerState extends State<IgVideoPlayer> {
-  MethodChannel? _methodChannel;
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(onTap: () {}, child: nativeViewManager());
