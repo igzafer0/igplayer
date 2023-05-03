@@ -55,20 +55,4 @@ class _IgVideoPlayerState extends State<IgVideoPlayer> {
   _onPlatformViewCreated(viewId) {
     _methodChannel = const MethodChannel("igzafer/NativeVideoPlayerMethodChannel");
   }
-
-  void _onMediaChanged() {
-    if (_methodChannel == null) {
-      nativeViewManager();
-    } else {
-      _methodChannel!.invokeMethod("onMediaChanged", {
-        "url": widget.videoUrl,
-      });
-    }
-  }
-
-  @override
-  void didUpdateWidget(covariant IgVideoPlayer oldWidget) {
-    _onMediaChanged();
-    super.didUpdateWidget(oldWidget);
-  }
 }
