@@ -17,6 +17,11 @@ class _IgVideoPlayerState extends State<IgVideoPlayer> {
   }
 
   Widget nativeViewManager() {
+    Future.delayed(const Duration(seconds: 2)).then((value) {
+      debugPrint("test");
+      MethodChannel _methodChannel = const MethodChannel("igzafer/NativeVideoPlayerMethodChannel");
+      _methodChannel.invokeMethod("method");
+    });
     if (Platform.isAndroid) {
       return androidView();
     } else {

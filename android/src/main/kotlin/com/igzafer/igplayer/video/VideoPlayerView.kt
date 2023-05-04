@@ -40,5 +40,6 @@ class VideoPlayerView internal constructor(
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         Log.d("winter", call.method)
+        player.playVideo()
     }
 }
