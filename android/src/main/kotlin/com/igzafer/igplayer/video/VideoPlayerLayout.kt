@@ -2,15 +2,15 @@ package com.igzafer.igplayer.video
 
 import android.app.Activity
 import android.content.Context
-import com.google.android.exoplayer2.DefaultLoadControl
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.LoadControl
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.analytics.AnalyticsListener
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
-import com.google.android.exoplayer2.trackselection.TrackSelector
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSource
@@ -20,20 +20,20 @@ import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.EventChannel.EventSink
 import io.flutter.plugin.common.JSONMethodCodec
 import org.json.JSONObject
+import java.util.Timer
 
 
 class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler {
-
-    var mPlayerView: ExoPlayer? = null
+    companion object {
+        var exoPlayer: ExoPlayer? = null
+    }
 
     private var eventSink: EventSink? = null
-
     private var activity: Activity? = null
-
-
     private var context: Context? = null
     private var messenger: BinaryMessenger? = null
     private var url: String? = ""
+    private var videoNotificationManager: VideoNotificationManager? = null
 
     constructor(context: Context?) : super(context!!)
     constructor(
@@ -45,8 +45,18 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
 
         val args = arguments as JSONObject
         url = args.getString("url")
-        initPlayer()
 
+        initPlayer()
+         initChannel()
+        videoNotificationManager = VideoNotificationManager(context, this, activity!!)
+        videoNotificationManager!!.init()
+
+    }
+
+    private fun initChannel() {
+        EventChannel(
+            messenger, "igzafer/NativeVideoPlayerEventChannel", JSONMethodCodec.INSTANCE
+        ).setStreamHandler(this)
 
     }
 
@@ -59,41 +69,83 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
     }
 
     fun playVideo() {
-
-        mPlayerView!!.prepare()
-
-        mPlayerView!!.play()
+        exoPlayer!!.prepare()
+        exoPlayer!!.play()
     }
-
+    fun newPosition(newPosition: Int){
+        exoPlayer!!.seekTo(newPosition.toLong())
+    }
     private fun initPlayer() {
+        exoPlayer = ExoPlayer.Builder(context!!).setUseLazyPreparation(true).build()
 
-        mPlayerView = ExoPlayer.Builder(context!!).setUseLazyPreparation(true)
-            .build()
-
-        player = mPlayerView
+        player = exoPlayer
         val dataSourceFactory: DataSource.Factory = DefaultDataSource.Factory(context!!)
-
 
         val videoSource: MediaSource
         videoSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(
             MediaItem.fromUri(url!!)
         )
-        mPlayerView!!.setMediaSource(videoSource)
-        mPlayerView!!.playWhenReady = false
+        exoPlayer!!.setMediaSource(videoSource)
+        exoPlayer!!.playWhenReady = true
         useController = false
+        exoPlayer!!.addAnalyticsListener(object : AnalyticsListener {
 
+            override fun onIsPlayingChanged(
+                eventTime: AnalyticsListener.EventTime, isPlaying: Boolean
+            ) {
+                Log.d("winter", "test")
+                videoNotificationManager!!.updateNotification(1)
+                super.onIsPlayingChanged(eventTime, isPlaying)
+            }
 
-        EventChannel(
-            messenger, "igzafer/NativeVideoPlayerEventChannel", JSONMethodCodec.INSTANCE
-        ).setStreamHandler(this)
+            override fun onPlaybackStateChanged(
+                eventTime: AnalyticsListener.EventTime, state: Int
+            ) {
+                if (state == Player.STATE_ENDED) {
+                    Log.d("winter", "girdi girdi")
 
+                    videoNotificationManager!!.updateNotification(2)
+                }
+
+                super.onPlaybackStateChanged(eventTime, state)
+            }
+
+        })
+
+        getPlayerPosition()
+    }
+
+    private fun getPlayerPosition() {
+        var oldTime =-1
+
+        val handler = Handler(Looper.getMainLooper())
+        val runnable: Runnable = object : Runnable {
+            override fun run() {
+                if((exoPlayer!!.currentPosition/1000).toInt()!=oldTime){
+                   val message = JSONObject()
+                    oldTime=    (exoPlayer!!.currentPosition/1000).toInt()
+                    message.put("name","playerTime")
+                    message.put("time",(exoPlayer!!.currentPosition/1000).toInt())
+                    eventSink?.success(message)
+                }
+                handler.postDelayed(this,250)
+            }
+
+        }
+        handler.post(runnable)
 
     }
 
-
     override fun onDestroy() {
-        mPlayerView!!.stop()
-        mPlayerView!!.release()
+        try {
+            exoPlayer!!.stop()
+            exoPlayer!!.release()
+            videoNotificationManager!!.doUnbindMediaNotificationManagerService()
+            videoNotificationManager!!.cleanPlayerNotification()
+        } catch (e: Exception) {
+        }
+
+
     }
 
 

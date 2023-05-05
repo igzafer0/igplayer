@@ -11,22 +11,19 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.platform.PlatformView
 
 class VideoPlayerView internal constructor(
-    context: Context?,
-    activity: Activity?,
-    messenger: BinaryMessenger?,
-    args: Any?
-) :
-    PlatformView, MethodCallHandler {
+    context: Context?, activity: Activity?, messenger: BinaryMessenger?, args: Any?
+) : PlatformView, MethodCallHandler {
     private val player: VideoPlayerLayout
 
     init {
-        MethodChannel(messenger!!, "igzafer/NativeVideoPlayerMethodChannel").setMethodCallHandler(this)
+        MethodChannel(messenger!!, "igzafer/NativeVideoPlayerMethodChannel").setMethodCallHandler(
+            this
+        )
         player = VideoPlayerLayout(context!!, activity, messenger, args)
-        Log.d("winter","e girdi")
 
     }
 
-    override fun getView(): View? {
+    override fun getView(): View {
         return player
     }
 
@@ -39,7 +36,13 @@ class VideoPlayerView internal constructor(
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-        Log.d("winter", call.method)
-        player.playVideo()
+        when (call.method) {
+            "play" -> {
+                player.playVideo()
+            }
+            "newPosition" -> {
+                player.newPosition(call.arguments as Int)
+            }
+        }
     }
 }

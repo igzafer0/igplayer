@@ -2,26 +2,30 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:igplayer/manage/igplayer_controller.dart';
+import 'package:igplayer/manage/video_player_bridge.dart';
 
 class IgVideoPlayer extends StatefulWidget {
-  const IgVideoPlayer({required this.videoUrl, Key? key}) : super(key: key);
+  const IgVideoPlayer({required this.videoUrl, required this.igPlayerController, Key? key}) : super(key: key);
   final String videoUrl;
+  final IgPlayerController igPlayerController;
   @override
   State<IgVideoPlayer> createState() => _IgVideoPlayerState();
 }
 
 class _IgVideoPlayerState extends State<IgVideoPlayer> {
+  late VideoPlayerBridge videoPlayerBridge;
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(onTap: () {}, child: nativeViewManager());
+    return nativeViewManager();
   }
 
   Widget nativeViewManager() {
-    Future.delayed(const Duration(seconds: 2)).then((value) {
-      debugPrint("test");
-      MethodChannel _methodChannel = const MethodChannel("igzafer/NativeVideoPlayerMethodChannel");
-      _methodChannel.invokeMethod("method");
-    });
     if (Platform.isAndroid) {
       return androidView();
     } else {
@@ -34,6 +38,9 @@ class _IgVideoPlayerState extends State<IgVideoPlayer> {
       viewType: 'igzafer/IgVideoPlayerNative',
       creationParams: {
         "url": widget.videoUrl,
+      },
+      onPlatformViewCreated: (id) {
+        videoPlayerBridge = VideoPlayerBridge(widget.igPlayerController);
       },
       creationParamsCodec: const JSONMessageCodec(),
     );

@@ -10,18 +10,19 @@ import io.flutter.plugin.platform.PlatformViewFactory
 import io.flutter.plugin.platform.PlatformViewRegistry
 import java.lang.Exception
 
-class VideoPlayerViewFactory(private val binaryMessenger: BinaryMessenger, private var activity: Activity) :
-    PlatformViewFactory(JSONMessageCodec.INSTANCE) {
+class VideoPlayerViewFactory(
+    private val binaryMessenger: BinaryMessenger, private var activity: Activity
+) : PlatformViewFactory(JSONMessageCodec.INSTANCE) {
 
     private var videoPlayerView: VideoPlayerView? = null
 
 
     override fun create(context: Context, id: Int, args: Any?): PlatformView {
-        videoPlayerView = VideoPlayerView(context,activity, binaryMessenger,args)
+        videoPlayerView = VideoPlayerView(context, activity, binaryMessenger, args)
         return videoPlayerView!!
     }
 
-    fun onDestroy() {
+    private fun onDestroy() {
         if (videoPlayerView != null) {
             videoPlayerView!!.dispose()
         }
@@ -29,7 +30,7 @@ class VideoPlayerViewFactory(private val binaryMessenger: BinaryMessenger, priva
 
     fun onAttachActivity(activity: Activity) {
         this.activity = activity
-        videoPlayerView!! .setActivity(activity)
+        videoPlayerView!!.setActivity(activity)
     }
 
     fun onDetachActivity() {
@@ -38,13 +39,11 @@ class VideoPlayerViewFactory(private val binaryMessenger: BinaryMessenger, priva
 
     companion object {
         fun registerWith(
-            viewRegistry: PlatformViewRegistry,
-            messenger: BinaryMessenger,
-            activity: Activity
+            viewRegistry: PlatformViewRegistry, messenger: BinaryMessenger, activity: Activity
         ): VideoPlayerViewFactory {
-                val plugin = VideoPlayerViewFactory(messenger, activity)
-                viewRegistry.registerViewFactory("igzafer/IgVideoPlayerNative", plugin)
-                return plugin
+            val plugin = VideoPlayerViewFactory(messenger, activity)
+            viewRegistry.registerViewFactory("igzafer/IgVideoPlayerNative", plugin)
+            return plugin
         }
     }
 }

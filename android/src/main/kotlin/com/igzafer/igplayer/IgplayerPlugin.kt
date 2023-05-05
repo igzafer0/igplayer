@@ -15,42 +15,38 @@ import io.flutter.plugin.common.MethodChannel.Result
 import java.lang.Exception
 
 
-class IgplayerPlugin: FlutterPlugin, ActivityAware {
+class IgplayerPlugin : FlutterPlugin, ActivityAware {
 
-  private lateinit var activity : Activity
-  private lateinit var playerViewFactory : VideoPlayerViewFactory
+    private lateinit var activity: Activity
+    private lateinit var playerViewFactory: VideoPlayerViewFactory
 
 
-  override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-    try {
-
-        playerViewFactory = VideoPlayerViewFactory.registerWith(binding.platformViewRegistry,binding.binaryMessenger,activity)
-    }catch (e:Exception){
+    override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+        playerViewFactory = VideoPlayerViewFactory.registerWith(
+            binding.platformViewRegistry, binding.binaryMessenger, activity
+        )
     }
-  }
 
-  override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-    playerViewFactory.onDetachActivity()
-  }
+    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+        playerViewFactory.onDetachActivity()
+    }
 
-  override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+    override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+        activity = binding.activity
+        playerViewFactory.onAttachActivity(binding.activity)
+    }
 
-    activity = binding.activity
+    override fun onDetachedFromActivityForConfigChanges() {
+        playerViewFactory.onDetachActivity()
+    }
 
-    playerViewFactory.onAttachActivity(binding.activity)
-  }
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+        activity = binding.activity
+        playerViewFactory.onAttachActivity(binding.activity)
+    }
 
-  override fun onDetachedFromActivityForConfigChanges() {
-    playerViewFactory.onDetachActivity()
-  }
-
-  override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-    activity = binding.activity
-    playerViewFactory.onAttachActivity(binding.activity)
-  }
-
-  override fun onDetachedFromActivity() {
-    playerViewFactory.onDetachActivity()
-  }
+    override fun onDetachedFromActivity() {
+        playerViewFactory.onDetachActivity()
+    }
 
 }
