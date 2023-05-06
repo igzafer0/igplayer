@@ -94,6 +94,10 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
             
             else if ("pause" == call.method) {
                 self.pause()
+            }else if ("newPosition" == call.method) {
+                self.newPosition(newPosition: call.arguments as! Int)
+            }else if ("skipPosition" == call.method) {
+                self.skipPosition(skipPosition: call.arguments as! Int )
             }
             
             
@@ -375,6 +379,29 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
         
     }
     
+    private func newPosition(newPosition:Int) {
+        let myTime = CMTime(seconds: Double(newPosition), preferredTimescale: 60000)
+        player?.seek(to: myTime,toleranceBefore: .zero, toleranceAfter: .zero)
+        
+        updateInfoPanelOnPause()
+        
+        
+    }
+    private func skipPosition(skipPosition:Int) {
+        if let currentItem = player?.currentItem {
+      
+            let currentTime = Int(CMTimeGetSeconds(currentItem.currentTime()))
+            let myTime = CMTime(seconds: Double(currentTime + skipPosition), preferredTimescale: 60000)
+            player?.seek(to: myTime,toleranceBefore: .zero, toleranceAfter: .zero)
+            
+            updateInfoPanelOnPause()
+            
+            
+        }
+       
+        
+    }
+
     private func onTimeInterval(time:CMTime) {
         if (isPlaying) {
             self.flutterEventSink?(["name":"playerTime","time":Int(time.seconds)] as [String : Any])
