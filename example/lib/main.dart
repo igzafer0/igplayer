@@ -21,11 +21,20 @@ class _MyAppState extends State<MyApp> {
   }
 
   final igPlayerController = IgPlayerController();
-
+  int index = 0;
+  var list = [
+    "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_1MB.mp4",
+    "https://video-previews.elements.envatousercontent.com/files/c7f6523b-b334-481c-8f9a-dbaa6ceb17ea/video_preview_h264.mp4"
+  ];
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        floatingActionButton: FloatingActionButton(onPressed: () {
+          setState(() {
+            index += 1;
+          });
+        }),
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
@@ -34,8 +43,16 @@ class _MyAppState extends State<MyApp> {
             StreamBuilder(
                 stream: igPlayerController.playerTimeListener.stream,
                 builder: (context, stream) {
-                  return Text(stream.data.toString());
+                  return Slider(
+                      value: stream.data!.toDouble(),
+                      max: igPlayerController.playerDuration.toDouble(),
+                      onChanged: (value) => igPlayerController.newPosition(value.toInt()));
                 }),
+            GestureDetector(
+                onTap: () {
+                  igPlayerController.play();
+                },
+                child: Container(width: 100, height: 100, color: Colors.blue)),
             GestureDetector(
                 onTap: () {
                   igPlayerController.newPosition(1);
@@ -49,7 +66,7 @@ class _MyAppState extends State<MyApp> {
             SizedBox(
               height: 250,
               child: IgVideoPlayer(
-                videoUrl: "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_1MB.mp4",
+                videoUrl: list[index],
                 igPlayerController: igPlayerController,
               ),
             ),

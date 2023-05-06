@@ -6,26 +6,31 @@ import 'package:igplayer/manage/igplayer_controller.dart';
 
 class VideoPlayerBridge {
   final IgPlayerController controller;
-
+  late MethodChannel methodChannel;
+  late EventChannel eventChannel;
   VideoPlayerBridge(this.controller) {
     _listenPlayerEvents();
-
-    MethodChannel methodChannel = const MethodChannel("igzafer/NativeVideoPlayerMethodChannel");
-    methodChannel.invokeMethod("play");
+    methodChannel = const MethodChannel("igzafer/NativeVideoPlayerMethodChannel");
   }
 
-  newPosition(int newPosition) {
-    MethodChannel methodChannel = const MethodChannel("igzafer/NativeVideoPlayerMethodChannel");
+  void mediaChanged(String videoUrl) {
+    methodChannel.invokeMethod("mediaChanged", {"url": videoUrl});
+  }
+
+  void newPosition(int newPosition) {
     methodChannel.invokeMethod("newPosition", newPosition);
   }
 
-  skip(int skipPosition) {
-    MethodChannel methodChannel = const MethodChannel("igzafer/NativeVideoPlayerMethodChannel");
+  void skip(int skipPosition) {
     methodChannel.invokeMethod("skipPosition", skipPosition);
   }
 
+  void play() {
+    methodChannel.invokeMethod("play");
+  }
+
   Future<void> _listenPlayerEvents() async {
-    EventChannel eventChannel = const EventChannel("igzafer/NativeVideoPlayerEventChannel", JSONMethodCodec());
+    eventChannel = const EventChannel("igzafer/NativeVideoPlayerEventChannel", JSONMethodCodec());
     eventChannel.receiveBroadcastStream([]).listen(_listenEvents);
   }
 
@@ -35,6 +40,11 @@ class VideoPlayerBridge {
     switch (event["name"]) {
       case "playerTime":
         controller.playerTimeListener.add(event["time"]);
+        break;
+      case "playerDuration":
+        debugPrint("testingo ${event["duration"]}");
+        controller.playerDuration = event["duration"];
+        break;
     }
   }
 }

@@ -98,6 +98,10 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
                 self.newPosition(newPosition: call.arguments as! Int)
             }else if ("skipPosition" == call.method) {
                 self.skipPosition(skipPosition: call.arguments as! Int )
+            }else if("mediaChanged" == call.method){
+                let parsedData = call.arguments as! [String: Any]
+                self.url = parsedData["url"] as! String
+                self.onMediaChanged()
             }
             
             
@@ -159,6 +163,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
                 time in self.onTimeInterval(time: time)
             }
             
+            
             self.playerViewController = AVPlayerViewController()
             if #available(iOS 10.0, *) {
                 self.playerViewController?.updatesNowPlayingInfoCenter = false
@@ -177,7 +182,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
             setupRemoteTransportControls()
             
             setupNowPlayingInfoPanel()
-            
+           
             let viewController = (UIApplication.shared.delegate?.window??.rootViewController)!
             viewController.addChild(self.playerViewController!)
         }
@@ -188,17 +193,18 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
     }
     
     private func onMediaChanged() {
+        self.pause()
         if let p = self.player {
             
             if let videoURL = URL(string: self.url) {
-                
+                self.duration = CMTimeGetSeconds(CMTime(value: -1, timescale: 1000))
                 /* create the new asset to play */
                 let asset = AVAsset(url: videoURL)
                 
                 let playerItem = AVPlayerItem(asset: asset, automaticallyLoadedAssetKeys: requiredAssetKeys)
                 
                 p.replaceCurrentItem(with: playerItem)
-                
+               
                 /* setup lock screen controls */
                 setupRemoteTransportControls()
                 setupNowPlayingInfoPanel()
@@ -218,7 +224,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
     }
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
-        
+       
         if keyPath == #keyPath(AVPlayerItem.status) {
             
             let newStatus: AVPlayerItem.Status
@@ -368,13 +374,13 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
     
     @objc private func play() {
         player?.play()
+       
     }
     
     private func pause() {
         
         player?.pause()
-        
-        updateInfoPanelOnPause()
+           updateInfoPanelOnPause()
         
         
     }
@@ -401,10 +407,22 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
        
         
     }
+    private var duration = CMTimeGetSeconds(CMTime(value: -1, timescale: 1000))
 
     private func onTimeInterval(time:CMTime) {
         if (isPlaying) {
             self.flutterEventSink?(["name":"playerTime","time":Int(time.seconds)] as [String : Any])
+            if(duration == CMTimeGetSeconds(CMTime(value: -1, timescale: 1000))){
+                if let currentItem = player?.currentItem {
+                    
+                     duration = CMTimeGetSeconds(currentItem.duration)
+                    print("testingo merhaba " + String(duration))
+                    self.flutterEventSink?(["name":"playerDuration","duration":Int(duration)] as [String : Any])
+
+                }
+                
+            }
+            
             updateInfoPanelOnTime()
         }
     }

@@ -14,7 +14,7 @@ class IgVideoPlayer extends StatefulWidget {
 }
 
 class _IgVideoPlayerState extends State<IgVideoPlayer> {
-  late VideoPlayerBridge videoPlayerBridge;
+  VideoPlayerBridge? videoPlayerBridge;
   @override
   void initState() {
     super.initState();
@@ -40,22 +40,37 @@ class _IgVideoPlayerState extends State<IgVideoPlayer> {
         "url": widget.videoUrl,
       },
       onPlatformViewCreated: (id) {
-        videoPlayerBridge = VideoPlayerBridge(widget.igPlayerController);
+        videoPlayerBridge ??= VideoPlayerBridge(widget.igPlayerController);
       },
       creationParamsCodec: const JSONMessageCodec(),
     );
   }
 
+  @override
+  void didUpdateWidget(covariant IgVideoPlayer oldWidget) {
+    if (oldWidget.videoUrl != widget.videoUrl) {
+      _mediaChanged();
+    }
+
+    super.didUpdateWidget(oldWidget);
+  }
+
   Widget iosView() {
+    debugPrint("çalıştım ${widget.videoUrl}");
+
     return UiKitView(
       viewType: 'igzafer/IgVideoPlayerNative',
       creationParams: {
         "url": widget.videoUrl,
       },
       onPlatformViewCreated: (id) {
-        videoPlayerBridge = VideoPlayerBridge(widget.igPlayerController);
+        videoPlayerBridge ??= VideoPlayerBridge(widget.igPlayerController);
       },
       creationParamsCodec: const JSONMessageCodec(),
     );
+  }
+
+  void _mediaChanged() {
+    videoPlayerBridge?.mediaChanged(widget.videoUrl);
   }
 }

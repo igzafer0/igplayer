@@ -4,9 +4,11 @@ import 'package:igplayer/manage/video_player_bridge.dart';
 
 class IgPlayerController {
   StreamController<int> playerTimeListener = StreamController<int>();
+  int playerDuration = 0;
 
   late VideoPlayerBridge _bridge;
   IgPlayerController() {
+    playerTimeListener.add(0);
     _bridge = VideoPlayerBridge(this);
   }
 
@@ -30,5 +32,9 @@ class IgPlayerController {
   ///It will go back by 1 second.
   void skip(int skipPosition) {
     _bridge.skip(skipPosition);
+  }
+
+  void play() {
+    _bridge.play();
   }
 }
