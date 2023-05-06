@@ -1,0 +1,423 @@
+//
+//  VideoPlayerView.swift
+//  igplayer
+//
+//  Created by Zafer Çetin on 6.05.2023.
+//
+
+import Foundation
+import AVFoundation
+import Flutter
+import MediaPlayer
+import AVKit
+
+
+
+class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatformView {
+    
+    static func register(with registrar: FlutterPluginRegistrar) { }
+    
+
+    var frame:CGRect
+    var viewId:Int64
+    
+    var player: IgPlayer?
+    var playerViewController:AVPlayerViewController?
+    
+    var url:String = ""
+    
+    
+    
+    
+    
+    private var isPlaying = false
+    private var timeObserverToken:Any?
+    let requiredAssetKeys = [
+        "playable",
+    ]
+    
+    private var eventChannel:FlutterEventChannel?
+    private var flutterEventSink:FlutterEventSink?
+    
+    private var nowPlayingInfo = [String : Any]()
+    
+    
+    init(frame:CGRect, viewId: Int64, messenger: FlutterBinaryMessenger, args: Any?) {
+        
+        self.frame = frame
+        self.viewId = viewId
+        
+        super.init()
+        
+        let audioSession = AVAudioSession.sharedInstance()
+        do {
+            if #available(iOS 10.0, *) {
+                try audioSession.setCategory(AVAudioSession.Category.playback, mode: .moviePlayback, options: AVAudioSession.CategoryOptions.allowBluetooth)
+            } else {
+                try audioSession.setCategory(AVAudioSession.Category.playback, options: AVAudioSession.CategoryOptions.allowBluetooth)
+            }
+        } catch _ { }
+        
+        setupEventChannel(viewId: viewId, messenger: messenger, instance: self)
+        
+        setupMethodChannel(viewId: viewId, messenger: messenger)
+        
+        
+        let parsedData = args as! [String: Any]
+        
+        
+        self.url = parsedData["url"] as! String
+        
+        
+        setupPlayer()
+    }
+    
+    private func setupEventChannel(viewId: Int64, messenger:FlutterBinaryMessenger, instance:VideoPlayerView) {
+        
+        instance.eventChannel = FlutterEventChannel(name: "igzafer/NativeVideoPlayerEventChannel" , binaryMessenger: messenger, codec: FlutterJSONMethodCodec.sharedInstance())
+        
+        instance.eventChannel!.setStreamHandler(instance)
+    }
+    
+    private func setupMethodChannel(viewId: Int64, messenger:FlutterBinaryMessenger) {
+        
+        let nativeMethodsChannel = FlutterMethodChannel(name: "igzafer/NativeVideoPlayerMethodChannel", binaryMessenger: messenger);
+        
+        nativeMethodsChannel.setMethodCallHandler({
+            (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
+            
+            
+            
+            if ("play" == call.method) {
+                self.play()
+            }
+            
+            else if ("pause" == call.method) {
+                self.pause()
+            }
+            
+            
+            else if ("dispose" == call.method) {
+                
+                self.dispose()
+                
+                result(true)
+            }
+            
+            
+            else { result(FlutterMethodNotImplemented) }
+        })
+    }
+    
+    func setupPlayer(){
+        if let videoURL = URL(string: self.url.trimmingCharacters(in: .whitespacesAndNewlines)) {
+            
+            do {
+                let audioSession = AVAudioSession.sharedInstance()
+                if #available(iOS 10.0, *) {
+                    try audioSession.setCategory(AVAudioSession.Category.playback, mode: .moviePlayback, options: AVAudioSession.CategoryOptions.allowBluetooth)
+                } else {
+                    try audioSession.setCategory(AVAudioSession.Category.playback, options: AVAudioSession.CategoryOptions.allowBluetooth)
+                }
+                try audioSession.setActive(true)
+            } catch _ { }
+            
+            let asset = AVAsset(url: videoURL)
+            
+            if (asset.isPlayable) {
+                
+                let playerItem = AVPlayerItem(asset: asset, automaticallyLoadedAssetKeys: requiredAssetKeys)
+                
+                self.player = IgPlayer(playerItem: playerItem)
+            }
+            else {
+                
+                self.player = IgPlayer()
+            }
+            
+            let center = NotificationCenter.default
+            
+            center.addObserver(self, selector: #selector(onComplete(_:)), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: self.player?.currentItem)
+          
+            if #available(iOS 12.0, *) {
+                self.player?.preventsDisplaySleepDuringVideoPlayback = true
+            }
+            
+            
+            self.player?.addObserver(self, forKeyPath: #keyPath(AVPlayer.status), options: [.new, .initial], context: nil)
+            self.player?.addObserver(self, forKeyPath: #keyPath(AVPlayerItem.status), options:[.old, .new, .initial], context: nil)
+            if #available(iOS 10.0, *) {
+                self.player?.addObserver(self, forKeyPath: #keyPath(AVPlayer.timeControlStatus), options:[.old, .new, .initial], context: nil)
+            }
+            
+            let interval = CMTime(seconds: 1.0, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
+            timeObserverToken = player?.addPeriodicTimeObserver(forInterval: interval, queue: .main) {
+                time in self.onTimeInterval(time: time)
+            }
+            
+            self.playerViewController = AVPlayerViewController()
+            if #available(iOS 10.0, *) {
+                self.playerViewController?.updatesNowPlayingInfoCenter = false
+            }
+            
+            self.playerViewController?.player = self.player
+            self.playerViewController?.view.frame = self.frame
+            self.playerViewController?.showsPlaybackControls = false
+            self.playerViewController?.allowsPictureInPicturePlayback = true
+            if #available(iOS 14.2, *) {
+                if AVPictureInPictureController.isPictureInPictureSupported() {
+                    self.playerViewController?.canStartPictureInPictureAutomaticallyFromInline = true
+                }
+            }
+            
+            setupRemoteTransportControls()
+            
+            setupNowPlayingInfoPanel()
+            
+            let viewController = (UIApplication.shared.delegate?.window??.rootViewController)!
+            viewController.addChild(self.playerViewController!)
+        }
+    }
+    
+    func view() -> UIView {
+        return self.playerViewController!.view
+    }
+    
+    private func onMediaChanged() {
+        if let p = self.player {
+            
+            if let videoURL = URL(string: self.url) {
+                
+                /* create the new asset to play */
+                let asset = AVAsset(url: videoURL)
+                
+                let playerItem = AVPlayerItem(asset: asset, automaticallyLoadedAssetKeys: requiredAssetKeys)
+                
+                p.replaceCurrentItem(with: playerItem)
+                
+                /* setup lock screen controls */
+                setupRemoteTransportControls()
+                setupNowPlayingInfoPanel()
+            }
+        }
+    }
+    
+    private func onShowControlsFlagChanged() {
+        self.playerViewController?.showsPlaybackControls = false
+    }
+    
+    @objc func onComplete(_ notification: Notification) {
+        pause()
+        isPlaying = false
+        self.player?.seek(to: CMTime(seconds: 0, preferredTimescale: CMTimeScale(NSEC_PER_SEC)))
+        updateInfoPanelOnComplete()
+    }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+        
+        if keyPath == #keyPath(AVPlayerItem.status) {
+            
+            let newStatus: AVPlayerItem.Status
+            
+            if let newStatusAsNumber = change?[NSKeyValueChangeKey.newKey] as? NSNumber {
+                newStatus = AVPlayerItem.Status(rawValue: newStatusAsNumber.intValue)!
+            } else {
+                newStatus = .unknown
+            }
+            
+            if newStatus == .failed {
+                
+                isPlaying = false
+                
+                self.flutterEventSink?(["name":"onError", "error":(String(describing: self.player?.currentItem?.error))])
+                
+            }
+        }
+        
+        if (keyPath == #keyPath(AVPlayer.status)) {
+            guard let p = object as! AVPlayer? else {
+                return
+            }
+            
+            switch (p.status) {
+            case .readyToPlay:
+                break
+            case .unknown:
+                break
+            case .failed:
+                break
+            @unknown default:
+                break
+            }
+        }
+        
+        else if #available(iOS 10.0, *) {
+            if keyPath == #keyPath(AVPlayer.timeControlStatus) {
+                
+                guard let p = object as! AVPlayer? else {
+                    return
+                }
+                
+                switch (p.timeControlStatus) {
+                    
+                case AVPlayer.TimeControlStatus.paused:
+                    isPlaying = false
+                    
+                    break
+                    
+                case AVPlayer.TimeControlStatus.playing:
+                    isPlaying = true
+                    self.flutterEventSink?(["name":"onPlay"])
+                    break
+                    
+                case .waitingToPlayAtSpecifiedRate: break
+                @unknown default:
+                    break
+                }
+                
+            } else {
+                super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+                return
+            }
+        } else {
+            super.observeValue(forKeyPath: keyPath,of: object,change: change,context: context)
+            return
+        }
+    }
+    
+ 
+    private func setupRemoteTransportControls() {
+        
+        let commandCenter = MPRemoteCommandCenter.shared()
+        
+        commandCenter.playCommand.addTarget { event in
+            if self.player?.rate == 0.0 {
+                self.play()
+                return .success
+            }
+            return .commandFailed
+        }
+        
+        commandCenter.pauseCommand.addTarget { event in
+            if self.player?.rate == 1.0 {
+                self.pause()
+                return .success
+            }
+            return .commandFailed
+        }
+    }
+    
+    
+    private func setupNowPlayingInfoPanel() {
+        
+        
+        nowPlayingInfo[MPMediaItemPropertyTitle] = "test3"
+        
+        nowPlayingInfo[MPMediaItemPropertyArtist] = "test4"
+        
+        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = player?.currentTime().seconds
+        
+        nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = player?.currentItem?.asset.duration.seconds
+        
+        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 0
+        
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+    }
+    
+    private func getData(from url: URL, completion: @escaping (UIImage?) -> Void) {
+        URLSession.shared.dataTask(with: url, completionHandler: {(data, response, error) in
+            if let data = data {
+                completion(UIImage(data:data))
+            }
+        })
+        .resume()
+    }
+    
+    
+    private func updateInfoPanelOnPause() {
+        
+        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = CMTimeGetSeconds((self.player?.currentTime())!)
+        
+        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 0
+        
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+    }
+    
+    
+    private func updateInfoPanelOnComplete() {
+        
+        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = 0
+        
+        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 0
+        
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+    }
+    
+    private func updateInfoPanelOnTime() {
+        
+        self.nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = CMTimeGetSeconds((self.player?.currentTime())!)
+        
+        self.nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 1
+        
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = self.nowPlayingInfo
+    }
+    
+    @objc private func play() {
+        player?.play()
+    }
+    
+    private func pause() {
+        
+        player?.pause()
+        
+        updateInfoPanelOnPause()
+        
+        
+    }
+    
+    private func onTimeInterval(time:CMTime) {
+        if (isPlaying) {
+            self.flutterEventSink?(["name":"playerTime","time":Int(time.seconds)] as [String : Any])
+            updateInfoPanelOnTime()
+        }
+    }
+    
+    public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        flutterEventSink = events
+        self.player?.flutterEventSink = events
+        return nil
+    }
+    
+    public func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        flutterEventSink = nil
+        self.player?.flutterEventSink = nil
+        return nil
+    }
+    
+    
+    
+    public func dispose() {
+        
+        self.player?.pause()
+        
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+        
+        if let timeObserver = timeObserverToken {
+            player?.removeTimeObserver(timeObserver)
+            timeObserverToken = nil
+        }
+        
+        do {
+            let audioSession = AVAudioSession.sharedInstance()
+            try audioSession.setActive(false)
+        } catch _ { }
+        
+        NotificationCenter.default.removeObserver(self)
+        self.player?.flutterEventSink = nil
+        self.flutterEventSink = nil
+        self.eventChannel?.setStreamHandler(nil)
+        self.player = nil
+    }
+    
+}
+

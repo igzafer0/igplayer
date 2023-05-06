@@ -5,9 +5,9 @@
 Pod::Spec.new do |s|
   s.name             = 'igplayer'
   s.version          = '0.0.1'
-  s.summary          = 'flutter için native bir player.'
+  s.summary          = 'A new Flutter plugin project.'
   s.description      = <<-DESC
-flutter için native bir player.
+A new Flutter plugin project.
                        DESC
   s.homepage         = 'http://example.com'
   s.license          = { :file => '../LICENSE' }

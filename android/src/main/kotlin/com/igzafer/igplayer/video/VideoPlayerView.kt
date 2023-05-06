@@ -43,6 +43,9 @@ class VideoPlayerView internal constructor(
             "newPosition" -> {
                 player.newPosition(call.arguments as Int)
             }
+            "skipPosition" -> {
+                player.skipPosition(call.arguments as Int)
+            }
         }
     }
 }

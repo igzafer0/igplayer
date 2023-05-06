@@ -29,7 +29,7 @@ class _IgVideoPlayerState extends State<IgVideoPlayer> {
     if (Platform.isAndroid) {
       return androidView();
     } else {
-      return Container();
+      return iosView();
     }
   }
 
@@ -48,9 +48,12 @@ class _IgVideoPlayerState extends State<IgVideoPlayer> {
 
   Widget iosView() {
     return UiKitView(
-      viewType: 'igzafer/IgPlayerNative',
+      viewType: 'igzafer/IgVideoPlayerNative',
       creationParams: {
-        "videoUrl": widget.videoUrl,
+        "url": widget.videoUrl,
+      },
+      onPlatformViewCreated: (id) {
+        videoPlayerBridge = VideoPlayerBridge(widget.igPlayerController);
       },
       creationParamsCodec: const JSONMessageCodec(),
     );

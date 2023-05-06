@@ -38,14 +38,18 @@ class _MyAppState extends State<MyApp> {
                 }),
             GestureDetector(
                 onTap: () {
-                  igPlayerController.newPosition(1000);
+                  igPlayerController.newPosition(1);
                 },
                 child: Container(width: 100, height: 100, color: Colors.red)),
+            GestureDetector(
+                onTap: () {
+                  igPlayerController.skip(10);
+                },
+                child: Container(width: 100, height: 100, color: Colors.green)),
             SizedBox(
               height: 250,
               child: IgVideoPlayer(
-                videoUrl:
-                    "https://www.shutterstock.com/shutterstock/videos/1068074216/preview/stock-footage-surgeons-use-augmented-reality-vr-glasses-to-investigate-patient-lungs-status-virus-detection-d.webm",
+                videoUrl: "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_1MB.mp4",
                 igPlayerController: igPlayerController,
               ),
             ),

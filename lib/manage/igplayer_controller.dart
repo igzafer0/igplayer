@@ -11,8 +11,19 @@ class IgPlayerController {
   ///```dart
   ///igPlayercontroller.newPosition(1)
   /// ```
-  /// And that's it. Your player will now skip to the first second.
+  /// And that's it. Your player will now jump to the first second.
   void newPosition(int newPosition) {
     VideoPlayerBridge(this).newPosition(newPosition);
+  }
+
+  ///It will skip forward or backward by the given parameter.
+  ///
+  ///For example:
+  ///```dart
+  ///igPlayercontroller.skip(-1)
+  /// ```
+  ///It will go back by 1 second.
+  void skip(int skipPosition) {
+    VideoPlayerBridge(this).skip(skipPosition);
   }
 }

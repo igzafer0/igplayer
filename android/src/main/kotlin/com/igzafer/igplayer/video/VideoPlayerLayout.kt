@@ -73,7 +73,10 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
         exoPlayer!!.play()
     }
     fun newPosition(newPosition: Int){
-        exoPlayer!!.seekTo(newPosition.toLong())
+        exoPlayer!!.seekTo(newPosition.toLong()*1000)
+    }
+    fun skipPosition(newPosition: Int){
+        exoPlayer!!.seekTo(exoPlayer!!.currentPosition+ (newPosition.toLong()*1000))
     }
     private fun initPlayer() {
         exoPlayer = ExoPlayer.Builder(context!!).setUseLazyPreparation(true).build()
