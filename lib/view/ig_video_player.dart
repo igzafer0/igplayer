@@ -56,8 +56,6 @@ class _IgVideoPlayerState extends State<IgVideoPlayer> {
   }
 
   Widget iosView() {
-    debugPrint("çalıştım ${widget.videoUrl}");
-
     return UiKitView(
       viewType: 'igzafer/IgVideoPlayerNative',
       creationParams: {

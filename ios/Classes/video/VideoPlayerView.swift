@@ -17,7 +17,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
     
     static func register(with registrar: FlutterPluginRegistrar) { }
     
-
+    
     var frame:CGRect
     var viewId:Int64
     
@@ -77,6 +77,8 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
         instance.eventChannel = FlutterEventChannel(name: "igzafer/NativeVideoPlayerEventChannel" , binaryMessenger: messenger, codec: FlutterJSONMethodCodec.sharedInstance())
         
         instance.eventChannel!.setStreamHandler(instance)
+        self.flutterEventSink?(["name":"created"])
+        
     }
     
     private func setupMethodChannel(viewId: Int64, messenger:FlutterBinaryMessenger) {
@@ -91,7 +93,6 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
             if ("play" == call.method) {
                 self.play()
             }
-            
             else if ("pause" == call.method) {
                 self.pause()
             }else if ("newPosition" == call.method) {
@@ -102,6 +103,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
                 let parsedData = call.arguments as! [String: Any]
                 self.url = parsedData["url"] as! String
                 self.onMediaChanged()
+                result(true)
             }
             
             
@@ -118,6 +120,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
     }
     
     func setupPlayer(){
+        
         if let videoURL = URL(string: self.url.trimmingCharacters(in: .whitespacesAndNewlines)) {
             
             do {
@@ -146,7 +149,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
             let center = NotificationCenter.default
             
             center.addObserver(self, selector: #selector(onComplete(_:)), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: self.player?.currentItem)
-          
+            
             if #available(iOS 12.0, *) {
                 self.player?.preventsDisplaySleepDuringVideoPlayback = true
             }
@@ -182,7 +185,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
             setupRemoteTransportControls()
             
             setupNowPlayingInfoPanel()
-           
+            
             let viewController = (UIApplication.shared.delegate?.window??.rootViewController)!
             viewController.addChild(self.playerViewController!)
         }
@@ -193,19 +196,11 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
     }
     
     private func onMediaChanged() {
-        self.pause()
         if let p = self.player {
-            
             if let videoURL = URL(string: self.url) {
-                self.duration = CMTimeGetSeconds(CMTime(value: -1, timescale: 1000))
-                /* create the new asset to play */
                 let asset = AVAsset(url: videoURL)
-                
                 let playerItem = AVPlayerItem(asset: asset, automaticallyLoadedAssetKeys: requiredAssetKeys)
-                
                 p.replaceCurrentItem(with: playerItem)
-               
-                /* setup lock screen controls */
                 setupRemoteTransportControls()
                 setupNowPlayingInfoPanel()
             }
@@ -224,7 +219,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
     }
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
-       
+        
         if keyPath == #keyPath(AVPlayerItem.status) {
             
             let newStatus: AVPlayerItem.Status
@@ -295,7 +290,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
         }
     }
     
- 
+    
     private func setupRemoteTransportControls() {
         
         let commandCenter = MPRemoteCommandCenter.shared()
@@ -374,13 +369,13 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
     
     @objc private func play() {
         player?.play()
-       
+        
     }
     
     private func pause() {
         
         player?.pause()
-           updateInfoPanelOnPause()
+        updateInfoPanelOnPause()
         
         
     }
@@ -388,14 +383,15 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
     private func newPosition(newPosition:Int) {
         let myTime = CMTime(seconds: Double(newPosition), preferredTimescale: 60000)
         player?.seek(to: myTime,toleranceBefore: .zero, toleranceAfter: .zero)
-        
+        self.flutterEventSink?(["name":"playerTime","time":Int(newPosition)] as [String : Any])
+       
         updateInfoPanelOnPause()
         
         
     }
     private func skipPosition(skipPosition:Int) {
         if let currentItem = player?.currentItem {
-      
+            
             let currentTime = Int(CMTimeGetSeconds(currentItem.currentTime()))
             let myTime = CMTime(seconds: Double(currentTime + skipPosition), preferredTimescale: 60000)
             player?.seek(to: myTime,toleranceBefore: .zero, toleranceAfter: .zero)
@@ -404,22 +400,26 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
             
             
         }
-       
+        
         
     }
-    private var duration = CMTimeGetSeconds(CMTime(value: -1, timescale: 1000))
-
+    
+    
+    
     private func onTimeInterval(time:CMTime) {
         if (isPlaying) {
             self.flutterEventSink?(["name":"playerTime","time":Int(time.seconds)] as [String : Any])
-            if(duration == CMTimeGetSeconds(CMTime(value: -1, timescale: 1000))){
-                if let currentItem = player?.currentItem {
+            
+            if let currentItem = player?.currentItem {
+                if(!currentItem.duration.seconds.isNaN){
+                    var duration = CMTimeGetSeconds(currentItem.duration)
                     
-                     duration = CMTimeGetSeconds(currentItem.duration)
-                    print("testingo merhaba " + String(duration))
                     self.flutterEventSink?(["name":"playerDuration","duration":Int(duration)] as [String : Any])
-
+                    
+                    
+                    
                 }
+                
                 
             }
             

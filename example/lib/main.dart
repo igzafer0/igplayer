@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:igplayer/manage/igplayer_controller.dart';
-
 import 'package:igplayer/view/ig_video_player.dart';
 
 void main() {
@@ -28,6 +27,7 @@ class _MyAppState extends State<MyApp> {
   ];
   @override
   Widget build(BuildContext context) {
+    debugPrint("index: $index");
     return MaterialApp(
       home: Scaffold(
         floatingActionButton: FloatingActionButton(onPressed: () {
@@ -43,10 +43,15 @@ class _MyAppState extends State<MyApp> {
             StreamBuilder(
                 stream: igPlayerController.playerTimeListener.stream,
                 builder: (context, stream) {
-                  return Slider(
-                      value: stream.data!.toDouble(),
-                      max: igPlayerController.playerDuration.toDouble(),
-                      onChanged: (value) => igPlayerController.newPosition(value.toInt()));
+                  if (stream.data != null) {
+                    return Slider(
+                        value: stream.data!.toDouble(),
+                        max: igPlayerController.playerDuration.toDouble(),
+                        onChangeStart: (value) => igPlayerController.pause(),
+                        onChangeEnd: (value) => igPlayerController.play(),
+                        onChanged: (value) => igPlayerController.newPosition(value.toInt()));
+                  }
+                  return Container();
                 }),
             GestureDetector(
                 onTap: () {

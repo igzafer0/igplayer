@@ -37,4 +37,8 @@ class IgPlayerController {
   void play() {
     _bridge.play();
   }
+
+  void pause() {
+    _bridge.pause();
+  }
 }

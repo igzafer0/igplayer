@@ -29,20 +29,21 @@ class VideoPlayerBridge {
     methodChannel.invokeMethod("play");
   }
 
+  void pause() {
+    methodChannel.invokeMethod("pause");
+  }
+
   Future<void> _listenPlayerEvents() async {
     eventChannel = const EventChannel("igzafer/NativeVideoPlayerEventChannel", JSONMethodCodec());
     eventChannel.receiveBroadcastStream([]).listen(_listenEvents);
   }
 
   void _listenEvents(dynamic event) async {
-    debugPrint(event["time"].toString());
-
     switch (event["name"]) {
       case "playerTime":
         controller.playerTimeListener.add(event["time"]);
         break;
       case "playerDuration":
-        debugPrint("testingo ${event["duration"]}");
         controller.playerDuration = event["duration"];
         break;
     }
