@@ -22,12 +22,11 @@ class _MyAppState extends State<MyApp> {
   final igPlayerController = IgPlayerController();
   int index = 0;
   var list = [
-    "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_1MB.mp4",
-    "https://video-previews.elements.envatousercontent.com/files/c7f6523b-b334-481c-8f9a-dbaa6ceb17ea/video_preview_h264.mp4"
+    "https://video-previews.elements.envatousercontent.com/files/c7f6523b-b334-481c-8f9a-dbaa6ceb17ea/video_preview_h264.mp4",
+    "https://player.vimeo.com/progressive_redirect/playback/788609312/rendition/720p/file.mp4?loc=external&oauth2_token_id=1669343316&signature=11c76e88b0868c8bf5119c752406dc0ee9d278eda5cf21db204bc588697f3cd4",
   ];
   @override
   Widget build(BuildContext context) {
-    debugPrint("index: $index");
     return MaterialApp(
       home: Scaffold(
         floatingActionButton: FloatingActionButton(onPressed: () {
@@ -65,7 +64,7 @@ class _MyAppState extends State<MyApp> {
                 child: Container(width: 100, height: 100, color: Colors.red)),
             GestureDetector(
                 onTap: () {
-                  igPlayerController.skip(-5);
+                  igPlayerController.skip(-50);
                 },
                 child: Container(width: 100, height: 100, color: Colors.green)),
             SizedBox(

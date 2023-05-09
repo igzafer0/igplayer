@@ -69,6 +69,8 @@ class _IgVideoPlayerState extends State<IgVideoPlayer> {
   }
 
   void _mediaChanged() {
+    videoPlayerBridge?.controller.pause();
     videoPlayerBridge?.mediaChanged(widget.videoUrl);
+    videoPlayerBridge?.controller.play();
   }
 }

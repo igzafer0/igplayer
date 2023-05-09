@@ -22,6 +22,7 @@ class VideoPlayerFactory: NSObject, FlutterPlatformViewFactory {
     /* register video player */
     static func register(with registrar: FlutterPluginRegistrar) {
         
+     
         let plugin = VideoPlayerFactory(messenger: registrar.messenger())
         
         plugin.registrar = registrar

@@ -43,7 +43,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
     
     
     init(frame:CGRect, viewId: Int64, messenger: FlutterBinaryMessenger, args: Any?) {
-        
+        print(timeObserverToken ?? "null "   )
         self.frame = frame
         self.viewId = viewId
         
@@ -106,12 +106,8 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
                 self.onMediaChanged()
                 result(true)
             }
-            
-            
             else if ("dispose" == call.method) {
-                
                 self.dispose()
-                
                 result(true)
             }
             
@@ -121,7 +117,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
     }
     
     func setupPlayer(){
-        
+     
         if let videoURL = URL(string: self.url.trimmingCharacters(in: .whitespacesAndNewlines)) {
             
             do {
@@ -167,6 +163,8 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
                 time in self.onTimeInterval(time: time)
             }
             
+        
+            
             
             self.playerViewController = AVPlayerViewController()
             if #available(iOS 10.0, *) {
@@ -187,6 +185,8 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
             
             setupNowPlayingInfoPanel()
             
+            play()
+            
             let viewController = (UIApplication.shared.delegate?.window??.rootViewController)!
             viewController.addChild(self.playerViewController!)
         }
@@ -204,7 +204,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
                 p.replaceCurrentItem(with: playerItem)
                 setupRemoteTransportControls()
                 setupNowPlayingInfoPanel()
-                self.play()
+               
             }
         }
     }
@@ -409,20 +409,15 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
     
     
     private func onTimeInterval(time:CMTime) {
+       
         if (isPlaying) {
             self.flutterEventSink?(["name":"playerTime","time":Int(time.seconds)] as [String : Any])
             
             if let currentItem = player?.currentItem {
                 if(!currentItem.duration.seconds.isNaN){
-                    var duration = CMTimeGetSeconds(currentItem.duration)
-                    
+                    let duration = CMTimeGetSeconds(currentItem.duration)
                     self.flutterEventSink?(["name":"playerDuration","duration":Int(duration)] as [String : Any])
-                    
-                    
-                    
                 }
-                
-                
             }
             
             updateInfoPanelOnTime()
