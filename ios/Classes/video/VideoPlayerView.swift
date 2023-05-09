@@ -100,6 +100,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
             }else if ("skipPosition" == call.method) {
                 self.skipPosition(skipPosition: call.arguments as! Int )
             }else if("mediaChanged" == call.method){
+                self.pause()
                 let parsedData = call.arguments as! [String: Any]
                 self.url = parsedData["url"] as! String
                 self.onMediaChanged()
@@ -203,6 +204,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
                 p.replaceCurrentItem(with: playerItem)
                 setupRemoteTransportControls()
                 setupNowPlayingInfoPanel()
+                self.play()
             }
         }
     }

@@ -11,6 +11,7 @@ class VideoPlayerBridge {
   VideoPlayerBridge(this.controller) {
     _listenPlayerEvents();
     methodChannel = const MethodChannel("igzafer/NativeVideoPlayerMethodChannel");
+    play();
   }
 
   void mediaChanged(String videoUrl) {
