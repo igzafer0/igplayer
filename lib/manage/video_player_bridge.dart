@@ -8,9 +8,7 @@ class VideoPlayerBridge {
   late MethodChannel methodChannel;
   late EventChannel eventChannel;
   VideoPlayerBridge(this.controller) {
-    _listenPlayerEvents();
     methodChannel = const MethodChannel("igzafer/NativeVideoPlayerMethodChannel");
-    play();
   }
 
   void mediaChanged(String videoUrl) {
@@ -33,7 +31,7 @@ class VideoPlayerBridge {
     methodChannel.invokeMethod("pause");
   }
 
-  Future<void> _listenPlayerEvents() async {
+  Future<void> listenPlayerEvents() async {
     eventChannel = const EventChannel("igzafer/NativeVideoPlayerEventChannel", JSONMethodCodec());
     eventChannel.receiveBroadcastStream([]).listen(_listenEvents);
   }

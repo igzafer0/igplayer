@@ -27,10 +27,12 @@ class IgVideoPlayer extends StatefulWidget {
 }
 
 class _IgVideoPlayerState extends State<IgVideoPlayer> {
-  VideoPlayerBridge? videoPlayerBridge;
+  late VideoPlayerBridge videoPlayerBridge;
   @override
   void initState() {
     super.initState();
+    videoPlayerBridge = VideoPlayerBridge(widget.igPlayerController);
+    widget.igPlayerController.initBridge(videoPlayerBridge);
   }
 
   @override
@@ -52,9 +54,7 @@ class _IgVideoPlayerState extends State<IgVideoPlayer> {
       creationParams: {
         "url": widget.videoUrl,
       },
-      onPlatformViewCreated: (id) {
-        videoPlayerBridge ??= VideoPlayerBridge(widget.igPlayerController);
-      },
+      onPlatformViewCreated: (id) {},
       creationParamsCodec: const JSONMessageCodec(),
     );
   }
@@ -79,15 +79,15 @@ class _IgVideoPlayerState extends State<IgVideoPlayer> {
         "subtitle": widget.subTitle
       },
       onPlatformViewCreated: (id) {
-        videoPlayerBridge ??= VideoPlayerBridge(widget.igPlayerController);
+        videoPlayerBridge.listenPlayerEvents();
       },
       creationParamsCodec: const JSONMessageCodec(),
     );
   }
 
   void _mediaChanged() {
-    videoPlayerBridge?.controller.pause();
-    videoPlayerBridge?.mediaChanged(widget.videoUrl);
-    videoPlayerBridge?.controller.play();
+    videoPlayerBridge.controller.pause();
+    videoPlayerBridge.mediaChanged(widget.videoUrl);
+    videoPlayerBridge.controller.play();
   }
 }

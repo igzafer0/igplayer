@@ -46,6 +46,12 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
     
     
     init(frame:CGRect, viewId: Int64, messenger: FlutterBinaryMessenger, args: Any?) {
+        
+        if let timeObserver = timeObserverToken {
+            player?.removeTimeObserver(timeObserver)
+            timeObserverToken = nil
+        }
+        
         print(timeObserverToken ?? "null "   )
         self.frame = frame
         self.viewId = viewId
@@ -123,7 +129,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
     }
     
     func setupPlayer(){
-     
+        
         if let videoURL = URL(string: self.url.trimmingCharacters(in: .whitespacesAndNewlines)) {
             
             do {
@@ -158,18 +164,16 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
             }
             
             
-            self.player?.addObserver(self, forKeyPath: #keyPath(AVPlayer.status), options: [.new, .initial], context: nil)
-            self.player?.addObserver(self, forKeyPath: #keyPath(AVPlayerItem.status), options:[.old, .new, .initial], context: nil)
-            if #available(iOS 10.0, *) {
-                self.player?.addObserver(self, forKeyPath: #keyPath(AVPlayer.timeControlStatus), options:[.old, .new, .initial], context: nil)
-            }
+            
+            self.player?.addObserver(self, forKeyPath: #keyPath(AVPlayer.timeControlStatus), options:[.old, .new, .initial], context: nil)
+            
             
             let interval = CMTime(seconds: 1.0, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
             timeObserverToken = player?.addPeriodicTimeObserver(forInterval: interval, queue: .main) {
                 time in self.onTimeInterval(time: time)
             }
             
-        
+            
             
             
             self.playerViewController = AVPlayerViewController()
@@ -212,7 +216,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
                 p.replaceCurrentItem(with: playerItem)
                 setupRemoteTransportControls()
                 setupNowPlayingInfoPanel()
-               
+                
             }
         }
     }
@@ -230,51 +234,13 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
         
-        if keyPath == #keyPath(AVPlayerItem.status) {
-            
-            let newStatus: AVPlayerItem.Status
-            
-            if let newStatusAsNumber = change?[NSKeyValueChangeKey.newKey] as? NSNumber {
-                newStatus = AVPlayerItem.Status(rawValue: newStatusAsNumber.intValue)!
-            } else {
-                newStatus = .unknown
-            }
-            
-            if newStatus == .failed {
-                
-                isPlaying = false
-                
-                self.flutterEventSink?(["name":"onError", "error":(String(describing: self.player?.currentItem?.error))])
-                
-            }
-        }
-        
-        if (keyPath == #keyPath(AVPlayer.status)) {
-            guard let p = object as! AVPlayer? else {
-                return
-            }
-            
-            switch (p.status) {
-            case .readyToPlay:
-                break
-            case .unknown:
-                break
-            case .failed:
-                break
-            @unknown default:
-                break
-            }
-        }
-        
-        else if #available(iOS 10.0, *) {
             if keyPath == #keyPath(AVPlayer.timeControlStatus) {
-                
+            
                 guard let p = object as! AVPlayer? else {
                     return
                 }
                 
                 switch (p.timeControlStatus) {
-                    
                 case AVPlayer.TimeControlStatus.paused:
                     isPlaying = false
                     
@@ -294,10 +260,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
                 super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
                 return
             }
-        } else {
-            super.observeValue(forKeyPath: keyPath,of: object,change: change,context: context)
-            return
-        }
+       
     }
     
     
@@ -412,7 +375,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
         let myTime = CMTime(seconds: Double(newPosition), preferredTimescale: 60000)
         player?.seek(to: myTime,toleranceBefore: .zero, toleranceAfter: .zero)
         self.flutterEventSink?(["name":"playerTime","time":Int(newPosition)] as [String : Any])
-       
+        
         updateInfoPanelOnPause()
         
         
@@ -435,7 +398,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
     
     
     private func onTimeInterval(time:CMTime) {
-       
+        
         if (isPlaying) {
             self.flutterEventSink?(["name":"playerTime","time":Int(time.seconds)] as [String : Any])
             

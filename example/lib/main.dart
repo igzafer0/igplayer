@@ -71,9 +71,11 @@ class _MyAppState extends State<MyApp> {
               height: 250,
               child: IgVideoPlayer(
                 videoUrl: list[index],
+                title: "Turgut Özal",
+                subTitle: "Yaz Günü",
                 igPlayerController: igPlayerController,
                 artworkUrl:
-                    "https://instagram.fayt1-1.fna.fbcdn.net/v/t51.2885-19/332834397_933324027667962_5038322828268599181_n.jpg?stp=dst-jpg_s320x320&_nc_ht=instagram.fayt1-1.fna.fbcdn.net&_nc_cat=106&_nc_ohc=jXCxi1VSX3YAX_ZvCou&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfBRSOqNLvbGUddizDXov2_NniPRoU7abCTQX-hbhWT_yA&oe=6460EFA9&_nc_sid=8fd12b",
+                    "https://cdnuploads.aa.com.tr/uploads/PhotoGallery/2013/04/17/thumbs_b2_8277f4b5ed0321254b5e6e09ca4d3fd2.jpg",
               ),
             ),
           ],

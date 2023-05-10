@@ -6,10 +6,13 @@ class IgPlayerController {
   StreamController<int> playerTimeListener = StreamController<int>();
   int playerDuration = 0;
 
-  late VideoPlayerBridge _bridge;
+  late VideoPlayerBridge bridge;
   IgPlayerController() {
     playerTimeListener.add(0);
-    _bridge = VideoPlayerBridge(this);
+  }
+
+  initBridge(VideoPlayerBridge bridge) {
+    this.bridge = bridge;
   }
 
   ///Updates your player position with `newPosition`
@@ -20,7 +23,7 @@ class IgPlayerController {
   /// ```
   /// And that's it. Your player will now jump to the first second.
   void newPosition(int newPosition) {
-    _bridge.newPosition(newPosition);
+    bridge.newPosition(newPosition);
   }
 
   ///It will skip forward or backward by the given parameter.
@@ -31,14 +34,14 @@ class IgPlayerController {
   /// ```
   ///It will go back by 1 second.
   void skip(int skipPosition) {
-    _bridge.skip(skipPosition);
+    bridge.skip(skipPosition);
   }
 
   void play() {
-    _bridge.play();
+    bridge.play();
   }
 
   void pause() {
-    _bridge.pause();
+    bridge.pause();
   }
 }
