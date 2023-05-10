@@ -6,9 +6,22 @@ import 'package:igplayer/manage/igplayer_controller.dart';
 import 'package:igplayer/manage/video_player_bridge.dart';
 
 class IgVideoPlayer extends StatefulWidget {
-  const IgVideoPlayer({required this.videoUrl, required this.igPlayerController, Key? key}) : super(key: key);
+  const IgVideoPlayer({
+    required this.videoUrl,
+    required this.igPlayerController,
+    this.autoPlay = false,
+    this.artworkUrl = "",
+    this.title = "IgPlayer",
+    this.subTitle = "Something Playing",
+    Key? key,
+  }) : super(key: key);
   final String videoUrl;
   final IgPlayerController igPlayerController;
+  final bool autoPlay;
+  final String artworkUrl;
+  final String title;
+  final String subTitle;
+
   @override
   State<IgVideoPlayer> createState() => _IgVideoPlayerState();
 }
@@ -60,6 +73,10 @@ class _IgVideoPlayerState extends State<IgVideoPlayer> {
       viewType: 'igzafer/IgVideoPlayerNative',
       creationParams: {
         "url": widget.videoUrl,
+        "autoPlay": widget.autoPlay,
+        "artworkUrl": widget.artworkUrl,
+        "title": widget.title,
+        "subtitle": widget.subTitle
       },
       onPlatformViewCreated: (id) {
         videoPlayerBridge ??= VideoPlayerBridge(widget.igPlayerController);

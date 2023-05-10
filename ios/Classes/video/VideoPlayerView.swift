@@ -25,7 +25,10 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
     var playerViewController:AVPlayerViewController?
     
     var url:String = ""
-    
+    var autoPlay:Bool = false
+    var artworkUrl:String = ""
+    var title:String = ""
+    var subtitle:String = ""
     
     
     
@@ -67,7 +70,10 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
         
         
         self.url = parsedData["url"] as! String
-        
+        self.autoPlay = parsedData["autoPlay"] as! Bool
+        self.artworkUrl = parsedData["artworkUrl"] as! String
+        self.title = parsedData["title"] as! String
+        self.subtitle = parsedData["subtitle"] as! String
         
         setupPlayer()
     }
@@ -184,8 +190,10 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
             setupRemoteTransportControls()
             
             setupNowPlayingInfoPanel()
+            if(self.autoPlay){
+                play()
+            }
             
-            play()
             
             let viewController = (UIApplication.shared.delegate?.window??.rootViewController)!
             viewController.addChild(self.playerViewController!)
@@ -316,11 +324,29 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
     
     
     private func setupNowPlayingInfoPanel() {
+        let urlArt = self.artworkUrl
+        guard let url = URL(string: urlArt) else { return }
+        getData(from: url) { [weak self] image in
+            guard let self = self,
+                  let downloadedImage = image else {
+                return
+            }
+            
+            if #available(iOS 10.0, *) {
+                let artwork = MPMediaItemArtwork.init(boundsSize: downloadedImage.size, requestHandler: { _ -> UIImage in
+                    return downloadedImage
+                })
+                nowPlayingInfo[MPMediaItemPropertyArtwork] = artwork
+            } else {
+                let artwork = MPMediaItemArtwork(image: downloadedImage)
+                nowPlayingInfo[MPMediaItemPropertyArtwork] = artwork
+            }
+            
+        }
         
         
-        nowPlayingInfo[MPMediaItemPropertyTitle] = "test3"
-        
-        nowPlayingInfo[MPMediaItemPropertyArtist] = "test4"
+        nowPlayingInfo[MPMediaItemPropertyTitle] = self.title
+        nowPlayingInfo[MPMediaItemPropertyArtist] = self.subtitle
         
         nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = player?.currentTime().seconds
         

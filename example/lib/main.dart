@@ -72,6 +72,8 @@ class _MyAppState extends State<MyApp> {
               child: IgVideoPlayer(
                 videoUrl: list[index],
                 igPlayerController: igPlayerController,
+                artworkUrl:
+                    "https://instagram.fayt1-1.fna.fbcdn.net/v/t51.2885-19/332834397_933324027667962_5038322828268599181_n.jpg?stp=dst-jpg_s320x320&_nc_ht=instagram.fayt1-1.fna.fbcdn.net&_nc_cat=106&_nc_ohc=jXCxi1VSX3YAX_ZvCou&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfBRSOqNLvbGUddizDXov2_NniPRoU7abCTQX-hbhWT_yA&oe=6460EFA9&_nc_sid=8fd12b",
               ),
             ),
           ],
