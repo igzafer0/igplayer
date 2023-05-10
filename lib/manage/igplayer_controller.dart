@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 
 import 'package:igplayer/manage/video_player_bridge.dart';
 
@@ -43,5 +44,15 @@ class IgPlayerController {
 
   void pause() {
     bridge.pause();
+  }
+
+  ///This is a very funny method. You can change the video speed but...
+  ///
+  ///But if you send negative value, the video starts to rewind
+  ///
+  ///1.0 is default speed 2.0 is 2x speed and 0.25 is 0.25 speed.
+
+  void changeSpeed(double speed) {
+    bridge.changeSpeed(speed);
   }
 }

@@ -25,6 +25,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
     var playerViewController:AVPlayerViewController?
     
     var url:String = ""
+    var speed:Float = 1.0
     var autoPlay:Bool = false
     var artworkUrl:String = ""
     var title:String = ""
@@ -47,10 +48,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
     
     init(frame:CGRect, viewId: Int64, messenger: FlutterBinaryMessenger, args: Any?) {
         
-        if let timeObserver = timeObserverToken {
-            player?.removeTimeObserver(timeObserver)
-            timeObserverToken = nil
-        }
+        
         
         print(timeObserverToken ?? "null "   )
         self.frame = frame
@@ -117,6 +115,10 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
                 self.url = parsedData["url"] as! String
                 self.onMediaChanged()
                 result(true)
+            }else if("changeSpeed" == call.method){
+
+                self.speed = call.arguments as! Float
+                self.changeSpeed()
             }
             else if ("dispose" == call.method) {
                 self.dispose()
@@ -208,6 +210,9 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
         return self.playerViewController!.view
     }
     
+    private func changeSpeed(){
+        player?.rate = self.speed
+    }
     private func onMediaChanged() {
         if let p = self.player {
             if let videoURL = URL(string: self.url) {

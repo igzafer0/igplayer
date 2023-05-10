@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:igplayer/manage/igplayer_controller.dart';
 import 'package:igplayer/view/ig_video_player.dart';
@@ -64,7 +66,7 @@ class _MyAppState extends State<MyApp> {
                 child: Container(width: 100, height: 100, color: Colors.red)),
             GestureDetector(
                 onTap: () {
-                  igPlayerController.skip(-50);
+                  igPlayerController.changeSpeed(-7.0);
                 },
                 child: Container(width: 100, height: 100, color: Colors.green)),
             SizedBox(

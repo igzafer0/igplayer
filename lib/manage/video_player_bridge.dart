@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 
 import 'package:flutter/services.dart';
 import 'package:igplayer/manage/igplayer_controller.dart';
@@ -29,6 +30,10 @@ class VideoPlayerBridge {
 
   void pause() {
     methodChannel.invokeMethod("pause");
+  }
+
+  void changeSpeed(double speed) {
+    methodChannel.invokeMethod("changeSpeed", speed);
   }
 
   Future<void> listenPlayerEvents() async {
