@@ -71,11 +71,11 @@ class _MyAppState extends State<MyApp> {
               height: 250,
               child: IgVideoPlayer(
                 videoUrl: list[index],
-                title: "Kenan Evren",
-                subTitle: "Sağı solu kes",
+                title: "TEST",
+                subTitle: "TEST2",
                 igPlayerController: igPlayerController,
                 artworkUrl:
-                    "https://cdnuploads.aa.com.tr/uploads/PhotoGallery/2013/04/17/thumbs_b2_8277f4b5ed0321254b5e6e09ca4d3fd2.jpg",
+                    "https://www.google.com/url?sa=i&url=https%3A%2F%2Fiso.500px.com%2F10-helpful-tips-to-jumpstart-your-stock-photography-business%2F&psig=AOvVaw2XKpYyjjphAQj18Q98hMCl&ust=1683879068372000&source=images&cd=vfe&ved=0CBEQjRxqFwoTCKCttr_o7P4CFQAAAAAdAAAAABAE",
               ),
             ),
           ],

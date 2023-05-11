@@ -17,6 +17,8 @@ class VideoNotificationReceiver : BroadcastReceiver() {
                 when (event.keyCode) {
                     KeyEvent.KEYCODE_MEDIA_PAUSE -> VideoPlayerLayout.exoPlayer?.pause()
                     KeyEvent.KEYCODE_MEDIA_PLAY -> VideoPlayerLayout.exoPlayer?.play()
+                    KeyEvent.KEYCODE_FORWARD -> VideoPlayerLayout.skipPosition(10)
+                    KeyEvent.KEYCODE_MEDIA_REWIND ->  VideoPlayerLayout.skipPosition(-10)
                 }
             }
         }

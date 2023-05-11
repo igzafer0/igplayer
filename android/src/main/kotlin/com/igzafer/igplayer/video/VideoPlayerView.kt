@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.util.Log
 import android.view.View
+import com.igzafer.igplayer.video.VideoPlayerLayout.Companion.skipPosition
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -46,7 +47,8 @@ class VideoPlayerView internal constructor(
                 player.newPosition(call.arguments as Int)
             }
             "skipPosition" -> {
-                player.skipPosition(call.arguments as Int)
+
+                skipPosition(call.arguments as Int)
             }
             "mediaChanged" -> {
                 player.onMediaChanged(call.arguments)

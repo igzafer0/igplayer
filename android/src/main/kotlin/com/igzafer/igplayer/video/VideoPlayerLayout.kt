@@ -23,11 +23,19 @@ import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.EventChannel.EventSink
 import io.flutter.plugin.common.JSONMethodCodec
 import org.json.JSONObject
+import kotlin.math.abs
 
 
 class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler {
     companion object {
         var exoPlayer: ExoPlayer? = null
+
+        fun skipPosition(newPosition: Int) {
+            exoPlayer!!.seekTo(exoPlayer!!.currentPosition + (newPosition.toLong() * 1000))
+        }
+    }
+    fun newPosition(newPosition: Int) {
+        exoPlayer!!.seekTo(newPosition.toLong() * 1000)
     }
 
     private var eventSink: EventSink? = null
@@ -83,13 +91,7 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
         exoPlayer!!.play()
     }
 
-    fun newPosition(newPosition: Int) {
-        exoPlayer!!.seekTo(newPosition.toLong() * 1000)
-    }
 
-    fun skipPosition(newPosition: Int) {
-        exoPlayer!!.seekTo(exoPlayer!!.currentPosition + (newPosition.toLong() * 1000))
-    }
 
     private fun initPlayer() {
         exoPlayer = ExoPlayer.Builder(context!!).setUseLazyPreparation(true).build()
@@ -171,7 +173,7 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
 
     }
     fun changeSpeed(speed:Double){
-        exoPlayer!!.setPlaybackSpeed(speed.toFloat())
+        exoPlayer!!.setPlaybackSpeed(abs(speed.toFloat()))
     }
     override fun onDestroy() {
         try {

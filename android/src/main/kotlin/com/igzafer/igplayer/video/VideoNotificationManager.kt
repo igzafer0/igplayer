@@ -142,16 +142,20 @@ class VideoNotificationManager(
         val notificationBuilder: NotificationCompat.Builder = NotificationUtil().from(
             activity, context, mMediaSessionCompat!!, mNotificationChannelId
         )
+         notificationBuilder.addAction(R.drawable.ic_replay_10, "replay",
+             NotificationUtil.getActionIntent(context, KeyEvent.KEYCODE_MEDIA_REWIND));
 
          if(VideoPlayerLayout.exoPlayer?.isPlaying==true){
-             notificationBuilder.addAction(R.drawable.ic_pause, "Pause",
+             notificationBuilder.addAction(R.drawable.ic_pause, "pause",
                  NotificationUtil.getActionIntent(context, KeyEvent.KEYCODE_MEDIA_PAUSE));
 
          }else{
-             notificationBuilder.addAction(R.drawable.ic_pause, "Pause",
+             notificationBuilder.addAction(R.drawable.ic_play, "play",
                  NotificationUtil.getActionIntent(context, KeyEvent.KEYCODE_MEDIA_PLAY));
 
          }
+         notificationBuilder.addAction(R.drawable.is_forward_10, "forward",
+             NotificationUtil.getActionIntent(context, KeyEvent.KEYCODE_FORWARD));
 
 
          val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

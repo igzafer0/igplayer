@@ -44,11 +44,8 @@ class IgPlayerController {
     bridge.pause();
   }
 
-  ///This is a very funny method. You can change the video speed but...
-  ///
-  ///But if you send negative value, the video starts to rewind
-  ///
   ///1.0 is default speed 2.0 is 2x speed and 0.25 is 0.25 speed.
+  ///No difference between negative or positive value
   void changeSpeed(double speed) {
     bridge.changeSpeed(speed);
   }
