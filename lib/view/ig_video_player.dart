@@ -48,6 +48,12 @@ class _IgVideoPlayerState extends State<IgVideoPlayer> {
     }
   }
 
+  @override
+  void dispose() {
+    videoPlayerBridge.dispose();
+    super.dispose();
+  }
+
   Widget androidView() {
     return AndroidView(
       viewType: 'igzafer/IgVideoPlayerNative',
@@ -92,8 +98,6 @@ class _IgVideoPlayerState extends State<IgVideoPlayer> {
   }
 
   void _mediaChanged() {
-    videoPlayerBridge.controller.pause();
     videoPlayerBridge.mediaChanged(widget.videoUrl);
-    videoPlayerBridge.controller.play();
   }
 }

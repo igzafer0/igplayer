@@ -53,8 +53,12 @@ class VideoPlayerView internal constructor(
             "mediaChanged" -> {
                 player.onMediaChanged(call.arguments)
             }
-            "changeSpeed"->{
+            "changeSpeed" -> {
                 player.changeSpeed(call.arguments as Double)
+            }
+            "dispose" -> {
+                dispose()
+                result.success(true)
             }
         }
     }

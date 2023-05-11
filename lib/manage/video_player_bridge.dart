@@ -36,6 +36,10 @@ class VideoPlayerBridge {
     methodChannel.invokeMethod("changeSpeed", speed);
   }
 
+  void dispose() {
+    methodChannel.invokeMethod("dispose");
+  }
+
   Future<void> listenPlayerEvents() async {
     eventChannel = const EventChannel("igzafer/NativeVideoPlayerEventChannel", JSONMethodCodec());
     eventChannel.receiveBroadcastStream([]).listen(_listenEvents);

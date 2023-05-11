@@ -73,9 +73,10 @@ class _MyAppState extends State<MyApp> {
                 videoUrl: list[index],
                 title: "TEST",
                 subTitle: "TEST2",
+                autoPlay: true,
                 igPlayerController: igPlayerController,
                 artworkUrl:
-                    "https://www.google.com/url?sa=i&url=https%3A%2F%2Fiso.500px.com%2F10-helpful-tips-to-jumpstart-your-stock-photography-business%2F&psig=AOvVaw2XKpYyjjphAQj18Q98hMCl&ust=1683879068372000&source=images&cd=vfe&ved=0CBEQjRxqFwoTCKCttr_o7P4CFQAAAAAdAAAAABAE",
+                    "https://i.discogs.com/_EqNbST80njT5rTLt3Ewq2uga8y0ciG9Ax02m2ea90k/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTExMjY4/NjktMTU4OTc1MjQ0/My04ODI1LmpwZWc.jpeg",
               ),
             ),
           ],

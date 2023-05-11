@@ -46,6 +46,7 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
     private var title: String = ""
     private var subtitle: String = ""
     private var artworkUrl: String = ""
+    private var autoPlay: Boolean= false
 
     private var videoNotificationManager: VideoNotificationManager? = null
 
@@ -62,6 +63,7 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
         title = args.getString("title")
         subtitle = args.getString("subtitle")
         artworkUrl = args.getString("artworkUrl")
+        autoPlay = args.getBoolean("autoPlay")
 
         initPlayer()
         initChannel()
@@ -87,7 +89,7 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
     }
 
     fun playVideo() {
-        exoPlayer!!.prepare()
+
         exoPlayer!!.play()
     }
 
@@ -104,13 +106,13 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
             MediaItem.fromUri(url)
         )
         exoPlayer!!.setMediaSource(videoSource)
-        exoPlayer!!.playWhenReady = true
+        exoPlayer!!.prepare()
+        if(autoPlay){
+            exoPlayer!!.playWhenReady = true
+        }
         useController = false
         exoPlayer!!.addAnalyticsListener(object : AnalyticsListener {
-
-            override fun onIsPlayingChanged(
-                eventTime: AnalyticsListener.EventTime, isPlaying: Boolean
-            ) {
+            override fun onIsPlayingChanged(eventTime: AnalyticsListener.EventTime, isPlaying: Boolean) {
                 videoNotificationManager!!.updateNotification()
                 super.onIsPlayingChanged(eventTime, isPlaying)
             }
@@ -158,9 +160,12 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
     }
 
     fun onMediaChanged(arguments: Any) {
-        val args = arguments as HashMap<String, String>
-        url = args["url"]!!
-
+        val args = arguments as HashMap<*, *>
+        url = args["url"]!! as String
+        title =args["title"]!! as String
+        subtitle =args["subtitle"]!! as String
+        artworkUrl =args["artworkUrl"]!! as String
+        autoPlay = args["autoPlay"]!! as Boolean
 
         val dataSourceFactory: DataSource.Factory = DefaultDataSource.Factory(context!!)
 
@@ -169,7 +174,9 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
             MediaItem.fromUri(url)
         )
         exoPlayer!!.setMediaSource(videoSource)
+        if (autoPlay)
         exoPlayer!!.prepare()
+
 
     }
     fun changeSpeed(speed:Double){
