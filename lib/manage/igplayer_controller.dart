@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:ffi';
-
 import 'package:igplayer/manage/video_player_bridge.dart';
 
 class IgPlayerController {

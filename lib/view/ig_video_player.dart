@@ -53,8 +53,14 @@ class _IgVideoPlayerState extends State<IgVideoPlayer> {
       viewType: 'igzafer/IgVideoPlayerNative',
       creationParams: {
         "url": widget.videoUrl,
+        "autoPlay": widget.autoPlay,
+        "artworkUrl": widget.artworkUrl,
+        "title": widget.title,
+        "subtitle": widget.subTitle
       },
-      onPlatformViewCreated: (id) {},
+      onPlatformViewCreated: (id) {
+        videoPlayerBridge.listenPlayerEvents();
+      },
       creationParamsCodec: const JSONMessageCodec(),
     );
   }

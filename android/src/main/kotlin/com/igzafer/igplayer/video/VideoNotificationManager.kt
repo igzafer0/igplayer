@@ -1,5 +1,6 @@
 package com.igzafer.igplayer.video
 
+import android.R.attr.subtitle
 import android.app.Activity
 import android.app.Notification
 import android.app.NotificationChannel
@@ -8,7 +9,8 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.media.MediaMetadata
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.IBinder
 import android.support.v4.media.MediaMetadataCompat
@@ -18,13 +20,15 @@ import android.util.Log
 import android.view.KeyEvent
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
 import com.igzafer.igplayer.NotificationManagerService
 import com.igzafer.igplayer.NotificationUtil
 import com.igzafer.igplayer.R
-import java.lang.Exception
+
 
 class VideoNotificationManager(
-    val context: Context, val instance: VideoPlayerLayout, val activity: Activity
+    val context: Context, private val artworkUrl:String,private val title:String,private val subtitle:String, val instance: VideoPlayerLayout, val activity: Activity
 ) {
 
     private val NOTIFICATION_ID = 0
@@ -69,12 +73,48 @@ class VideoNotificationManager(
 
         mMediaSessionCompat!!.setCallback(MediaSessionCallback())
         mMediaSessionCompat!!.isActive = true
-         updateNotification(1)
+        setAudioMetadataWithArtwork()
+        updateNotification()
 
 
     }
+    private fun setAudioMetadataWithArtwork() {
+        if (artworkUrl.isNotEmpty()) {
+            Glide.with(context).asBitmap().load(artworkUrl).into(object : CustomTarget<Bitmap?>() {
+                override fun onResourceReady(
+                    resource: Bitmap,
+                    transition: com.bumptech.glide.request.transition.Transition<in Bitmap?>?
+                ) {
+                    setAudioMetadata(resource)
+                }
 
+                override fun onLoadFailed(errorDrawable: Drawable?) {
+                    setAudioMetadata(null)
 
+                    super.onLoadFailed(errorDrawable)
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?) {}
+
+            })
+        } else {
+            setAudioMetadata(null)
+        }
+    }
+    private fun setAudioMetadata(artwork: Bitmap?) {
+        val metadataBuilder = MediaMetadataCompat.Builder()
+            .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, title)
+            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, "igplayer")
+            .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, subtitle)
+
+        if (artwork != null) {
+            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, artwork)
+        }
+
+        val metadata = metadataBuilder.build()
+
+        mMediaSessionCompat!!.setMetadata(metadata)
+    }
     private class MediaSessionCallback : MediaSessionCompat.Callback() {
         override fun onPause() {
             VideoPlayerLayout.exoPlayer!!.pause()
@@ -95,30 +135,26 @@ class VideoNotificationManager(
         }
     }
 
-     fun updateNotification( capabilities:Long) {
+     fun updateNotification() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel()
         }
         val notificationBuilder: NotificationCompat.Builder = NotificationUtil().from(
             activity, context, mMediaSessionCompat!!, mNotificationChannelId
         )
-         if (capabilities and PlaybackStateCompat.ACTION_PAUSE != 0L) {
-             notificationBuilder.addAction(
-                 R.drawable.ic_pause, "Pause",
-                 NotificationUtil.getActionIntent(context, KeyEvent.KEYCODE_MEDIA_PAUSE)
-             )
-         }
 
-         if (capabilities and PlaybackStateCompat.ACTION_PLAY != 0L) {
-             notificationBuilder.addAction(
-                 R.drawable.ic_pause, "Play",
-                 NotificationUtil.getActionIntent(context, KeyEvent.KEYCODE_MEDIA_PLAY)
-             )
+         if(VideoPlayerLayout.exoPlayer?.isPlaying==true){
+             notificationBuilder.addAction(R.drawable.ic_pause, "Pause",
+                 NotificationUtil.getActionIntent(context, KeyEvent.KEYCODE_MEDIA_PAUSE));
+
+         }else{
+             notificationBuilder.addAction(R.drawable.ic_pause, "Pause",
+                 NotificationUtil.getActionIntent(context, KeyEvent.KEYCODE_MEDIA_PLAY));
+
          }
 
 
-         val notificationManager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
          val notification=notificationBuilder.build()
          notification.flags = Notification.FLAG_NO_CLEAR;
 

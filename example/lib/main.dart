@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:igplayer/manage/igplayer_controller.dart';
 import 'package:igplayer/view/ig_video_player.dart';
@@ -73,8 +71,8 @@ class _MyAppState extends State<MyApp> {
               height: 250,
               child: IgVideoPlayer(
                 videoUrl: list[index],
-                title: "Turgut Özal",
-                subTitle: "Yaz Günü",
+                title: "Kenan Evren",
+                subTitle: "Sağı solu kes",
                 igPlayerController: igPlayerController,
                 artworkUrl:
                     "https://cdnuploads.aa.com.tr/uploads/PhotoGallery/2013/04/17/thumbs_b2_8277f4b5ed0321254b5e6e09ca4d3fd2.jpg",

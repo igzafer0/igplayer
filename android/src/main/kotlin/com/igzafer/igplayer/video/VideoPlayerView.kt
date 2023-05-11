@@ -46,6 +46,9 @@ class VideoPlayerView internal constructor(
             "skipPosition" -> {
                 player.skipPosition(call.arguments as Int)
             }
+            "mediaChanged" -> {
+                player.onMediaChanged(call.arguments)
+            }
         }
     }
 }

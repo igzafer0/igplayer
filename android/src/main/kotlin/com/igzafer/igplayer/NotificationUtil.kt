@@ -9,6 +9,7 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.view.KeyEvent
 import androidx.core.app.NotificationCompat
 
+
 class NotificationUtil {
 
     fun from(
@@ -17,25 +18,26 @@ class NotificationUtil {
         mediaSession: MediaSessionCompat,
         notificationChannelId: String?
     ): NotificationCompat.Builder {
+        val controller = mediaSession.controller
 
+        val mediaMetadata = controller.metadata
+
+        val description = mediaMetadata.description
         val builder = NotificationCompat.Builder(
             context, notificationChannelId!!
         )
 
-        builder.setContentTitle("description.getTitle()")
-            .setContentText("description.getSubtitle()")
+        builder.setContentTitle(description.title)
+            .setContentText(description.subtitle)
             .setStyle(
                 androidx.media.app.NotificationCompat.MediaStyle()
                     .setMediaSession(mediaSession.sessionToken)
-                    .setShowCancelButton(true)
-                    .setCancelButtonIntent(getActionIntent(
-                            context,
-                            KeyEvent.KEYCODE_MEDIA_STOP
-                        )
-                    )
+                    
             )
+            .setLargeIcon(mediaMetadata.getBitmap(MediaMetadataCompat.METADATA_KEY_ART))
             .setColorized(true)
             .setAutoCancel(true)
+            .setOngoing(true)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setSmallIcon(R.drawable.ic_pause)
             .setDeleteIntent(
@@ -44,7 +46,6 @@ class NotificationUtil {
                     KeyEvent.KEYCODE_MEDIA_STOP
                 )
             )
-
 
         val intent = Intent(context, activity.javaClass)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP

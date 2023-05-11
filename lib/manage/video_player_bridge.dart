@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:ffi';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:igplayer/manage/igplayer_controller.dart';
 
@@ -42,6 +42,7 @@ class VideoPlayerBridge {
   }
 
   void _listenEvents(dynamic event) async {
+    debugPrint("gel gel ${event["duration"]}");
     switch (event["name"]) {
       case "playerTime":
         controller.playerTimeListener.add(event["time"]);
