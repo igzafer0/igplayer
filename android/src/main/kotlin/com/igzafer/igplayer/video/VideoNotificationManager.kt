@@ -28,7 +28,7 @@ import com.igzafer.igplayer.R
 
 
 class VideoNotificationManager(
-    val context: Context, private val artworkUrl:String,private val title:String,private val subtitle:String, val instance: VideoPlayerLayout, val activity: Activity
+    val context: Context,  val instance: VideoPlayerLayout, val activity: Activity
 ) {
 
     private val NOTIFICATION_ID = 0
@@ -61,7 +61,7 @@ class VideoNotificationManager(
         }
 
     private var mMediaSessionCompat: MediaSessionCompat? = null
-    private fun setupMediaSession() {
+     fun setupMediaSession() {
         val receiver = ComponentName(
             context.packageName, VideoNotificationReceiver::class.java.name
         )
@@ -79,8 +79,8 @@ class VideoNotificationManager(
 
     }
     private fun setAudioMetadataWithArtwork() {
-        if (artworkUrl.isNotEmpty()) {
-            Glide.with(context).asBitmap().load(artworkUrl).into(object : CustomTarget<Bitmap?>() {
+        if (VideoPlayerLayout.artworkUrl.isNotEmpty()) {
+            Glide.with(context).asBitmap().load(VideoPlayerLayout.artworkUrl).into(object : CustomTarget<Bitmap?>() {
                 override fun onResourceReady(
                     resource: Bitmap,
                     transition: com.bumptech.glide.request.transition.Transition<in Bitmap?>?
@@ -103,9 +103,9 @@ class VideoNotificationManager(
     }
     private fun setAudioMetadata(artwork: Bitmap?) {
         val metadataBuilder = MediaMetadataCompat.Builder()
-            .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, title)
+            .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, VideoPlayerLayout.title)
             .putString(MediaMetadataCompat.METADATA_KEY_TITLE, "igplayer")
-            .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, subtitle)
+            .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, VideoPlayerLayout.subtitle)
 
         if (artwork != null) {
             metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, artwork)

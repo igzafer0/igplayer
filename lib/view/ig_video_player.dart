@@ -98,6 +98,6 @@ class _IgVideoPlayerState extends State<IgVideoPlayer> {
   }
 
   void _mediaChanged() {
-    videoPlayerBridge.mediaChanged(widget.videoUrl);
+    videoPlayerBridge.mediaChanged(widget.videoUrl, widget.title, widget.subTitle, widget.artworkUrl, widget.autoPlay);
   }
 }

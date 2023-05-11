@@ -25,6 +25,7 @@ class _MyAppState extends State<MyApp> {
     "https://video-previews.elements.envatousercontent.com/files/c7f6523b-b334-481c-8f9a-dbaa6ceb17ea/video_preview_h264.mp4",
     "https://player.vimeo.com/progressive_redirect/playback/788609312/rendition/720p/file.mp4?loc=external&oauth2_token_id=1669343316&signature=11c76e88b0868c8bf5119c752406dc0ee9d278eda5cf21db204bc588697f3cd4",
   ];
+  String title = "oynamış";
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -32,6 +33,7 @@ class _MyAppState extends State<MyApp> {
         floatingActionButton: FloatingActionButton(onPressed: () {
           setState(() {
             index += 1;
+            title = "aynur";
           });
         }),
         appBar: AppBar(
@@ -71,9 +73,9 @@ class _MyAppState extends State<MyApp> {
               height: 250,
               child: IgVideoPlayer(
                 videoUrl: list[index],
-                title: "TEST",
+                title: title,
                 subTitle: "TEST2",
-                autoPlay: true,
+                autoPlay: false,
                 igPlayerController: igPlayerController,
                 artworkUrl:
                     "https://i.discogs.com/_EqNbST80njT5rTLt3Ewq2uga8y0ciG9Ax02m2ea90k/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTExMjY4/NjktMTU4OTc1MjQ0/My04ODI1LmpwZWc.jpeg",

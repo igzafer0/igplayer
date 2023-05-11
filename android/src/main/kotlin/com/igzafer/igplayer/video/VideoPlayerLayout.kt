@@ -29,7 +29,11 @@ import kotlin.math.abs
 class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler {
     companion object {
         var exoPlayer: ExoPlayer? = null
-
+         var url: String = ""
+         var title: String = ""
+         var subtitle: String = ""
+         var artworkUrl: String = ""
+         var autoPlay: Boolean= false
         fun skipPosition(newPosition: Int) {
             exoPlayer!!.seekTo(exoPlayer!!.currentPosition + (newPosition.toLong() * 1000))
         }
@@ -42,11 +46,7 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
     private var activity: Activity? = null
     private var context: Context? = null
     private var messenger: BinaryMessenger? = null
-    private var url: String = ""
-    private var title: String = ""
-    private var subtitle: String = ""
-    private var artworkUrl: String = ""
-    private var autoPlay: Boolean= false
+
 
     private var videoNotificationManager: VideoNotificationManager? = null
 
@@ -68,7 +68,7 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
         initPlayer()
         initChannel()
         videoNotificationManager =
-            VideoNotificationManager(context, artworkUrl, title, subtitle, this, activity!!)
+            VideoNotificationManager(context,  this, activity!!)
         videoNotificationManager!!.init()
 
     }
@@ -174,9 +174,12 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
             MediaItem.fromUri(url)
         )
         exoPlayer!!.setMediaSource(videoSource)
-        if (autoPlay)
         exoPlayer!!.prepare()
 
+        if (autoPlay){
+            exoPlayer!!.play()
+        }
+        videoNotificationManager!!.setupMediaSession()
 
     }
     fun changeSpeed(speed:Double){

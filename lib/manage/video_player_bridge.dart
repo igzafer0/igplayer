@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,8 +13,14 @@ class VideoPlayerBridge {
     methodChannel = const MethodChannel("igzafer/NativeVideoPlayerMethodChannel");
   }
 
-  void mediaChanged(String videoUrl) {
-    methodChannel.invokeMethod("mediaChanged", {"url": videoUrl});
+  void mediaChanged(String videoUrl, String title, String subtitle, String artworkUrl, bool autoPlay) {
+    methodChannel.invokeMethod("mediaChanged", {
+      "url": videoUrl,
+      "title": title,
+      "subtitle": subtitle,
+      "artworkUrl": artworkUrl,
+      "autoPlay": autoPlay,
+    });
   }
 
   void newPosition(int newPosition) {
@@ -46,7 +53,6 @@ class VideoPlayerBridge {
   }
 
   void _listenEvents(dynamic event) async {
-    debugPrint("gel gel ${event["duration"]}");
     switch (event["name"]) {
       case "playerTime":
         controller.playerTimeListener.add(event["time"]);
