@@ -170,7 +170,9 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
         exoPlayer!!.prepare()
 
     }
-
+    fun changeSpeed(speed:Double){
+        exoPlayer!!.setPlaybackSpeed(speed.toFloat())
+    }
     override fun onDestroy() {
         try {
             exoPlayer!!.stop()

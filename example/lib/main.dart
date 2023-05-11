@@ -64,7 +64,7 @@ class _MyAppState extends State<MyApp> {
                 child: Container(width: 100, height: 100, color: Colors.red)),
             GestureDetector(
                 onTap: () {
-                  igPlayerController.changeSpeed(-7.0);
+                  igPlayerController.changeSpeed(2);
                 },
                 child: Container(width: 100, height: 100, color: Colors.green)),
             SizedBox(

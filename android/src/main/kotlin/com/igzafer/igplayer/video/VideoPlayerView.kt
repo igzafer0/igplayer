@@ -35,6 +35,8 @@ class VideoPlayerView internal constructor(
         player.onDestroy()
     }
 
+
+
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "play" -> {
@@ -48,6 +50,9 @@ class VideoPlayerView internal constructor(
             }
             "mediaChanged" -> {
                 player.onMediaChanged(call.arguments)
+            }
+            "changeSpeed"->{
+                player.changeSpeed(call.arguments as Double)
             }
         }
     }
