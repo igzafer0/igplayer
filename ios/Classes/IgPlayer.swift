@@ -19,12 +19,7 @@ class IgPlayer: AVPlayer {
         let position = self.currentTime().seconds
         
         super.seek(to: time, toleranceBefore: toleranceAfter, toleranceAfter: toleranceAfter, completionHandler: { (isCompleted) in
-            print("test")
-            if (isCompleted) {
-              
-               
-    
-            }
+         
             
             /* call super completion handler */
             completionHandler(isCompleted)

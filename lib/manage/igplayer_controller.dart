@@ -49,4 +49,8 @@ class IgPlayerController {
   void changeSpeed(double speed) {
     bridge.changeSpeed(speed);
   }
+
+  void dispose() {
+    bridge.dispose();
+  }
 }

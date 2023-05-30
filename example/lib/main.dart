@@ -22,7 +22,7 @@ class _MyAppState extends State<MyApp> {
   final igPlayerController = IgPlayerController();
   int index = 0;
   var list = [
-    "https://video-previews.elements.envatousercontent.com/files/c7f6523b-b334-481c-8f9a-dbaa6ceb17ea/video_preview_h264.mp4",
+    " https://player.vimeo.com/external/830090120.m3u8?s=68861329fcf56f2eae4dad8b031b9d5b7bf14fdb&oauth2_token_id=1669343673",
     "https://player.vimeo.com/progressive_redirect/playback/788609312/rendition/720p/file.mp4?loc=external&oauth2_token_id=1669343316&signature=11c76e88b0868c8bf5119c752406dc0ee9d278eda5cf21db204bc588697f3cd4",
   ];
   String title = "oynamış";
