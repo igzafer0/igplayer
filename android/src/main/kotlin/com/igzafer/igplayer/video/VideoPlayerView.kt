@@ -43,6 +43,9 @@ class VideoPlayerView internal constructor(
             "play" -> {
                 player.playVideo()
             }
+            "pause" -> {
+                player.pauseVideo()
+            }
             "newPosition" -> {
                 player.newPosition(call.arguments as Int)
             }

@@ -34,6 +34,7 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
          var subtitle: String = ""
          var artworkUrl: String = ""
          var autoPlay: Boolean= false
+         var initialPosition:Int = 0
         fun skipPosition(newPosition: Int) {
             exoPlayer!!.seekTo(exoPlayer!!.currentPosition + (newPosition.toLong() * 1000))
         }
@@ -64,6 +65,7 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
         subtitle = args.getString("subtitle")
         artworkUrl = args.getString("artworkUrl")
         autoPlay = args.getBoolean("autoPlay")
+        initialPosition = args.getInt("initialPosition")
 
         initPlayer()
         initChannel()
@@ -91,6 +93,18 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
     fun playVideo() {
 
         exoPlayer!!.play()
+        val playerState = JSONObject()
+        playerState.put("name", "isPlaying")
+        playerState.put("state", true)
+        eventSink?.success(playerState)
+    }
+    fun pauseVideo() {
+
+        exoPlayer!!.pause()
+        val playerState = JSONObject()
+        playerState.put("name", "isPlaying")
+        playerState.put("state", false)
+        eventSink?.success(playerState)
     }
 
 
@@ -102,14 +116,20 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
         val dataSourceFactory: DataSource.Factory = DefaultDataSource.Factory(context!!)
 
         val videoSource: MediaSource
-        videoSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(
-            MediaItem.fromUri(url)
-        )
+        if(url.contains(".m3u8") || url.contains(".m3u")) {
+            videoSource =  HlsMediaSource.Factory(dataSourceFactory).createMediaSource(MediaItem.fromUri(url))
+        }else{
+            videoSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(
+                MediaItem.fromUri(url)
+            )
+        }
+
         exoPlayer!!.setMediaSource(videoSource)
         exoPlayer!!.prepare()
         if(autoPlay){
             exoPlayer!!.playWhenReady = true
         }
+        exoPlayer!!.seekTo((initialPosition*1000).toLong());
         useController = false
         exoPlayer!!.addAnalyticsListener(object : AnalyticsListener {
             override fun onIsPlayingChanged(eventTime: AnalyticsListener.EventTime, isPlaying: Boolean) {
@@ -170,14 +190,21 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
         val dataSourceFactory: DataSource.Factory = DefaultDataSource.Factory(context!!)
 
         val videoSource: MediaSource
+        if(url.contains(".m3u8") || url.contains(".m3u")) {
+            videoSource =  HlsMediaSource.Factory(dataSourceFactory).createMediaSource(MediaItem.fromUri(url))
+        } else {
         videoSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(
             MediaItem.fromUri(url)
-        )
+        ) }
         exoPlayer!!.setMediaSource(videoSource)
         exoPlayer!!.prepare()
 
         if (autoPlay){
             exoPlayer!!.play()
+            val playerState = JSONObject()
+            playerState.put("name", "isPlaying")
+            playerState.put("state", true)
+            eventSink?.success(playerState)
         }
         videoNotificationManager!!.setupMediaSession()
 
@@ -188,6 +215,10 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
     override fun onDestroy() {
         try {
             exoPlayer!!.stop()
+            val playerState = JSONObject()
+            playerState.put("name", "isPlaying")
+            playerState.put("state", false)
+            eventSink?.success(playerState)
             exoPlayer!!.release()
             videoNotificationManager!!.doUnbindMediaNotificationManagerService()
             videoNotificationManager!!.cleanPlayerNotification()
