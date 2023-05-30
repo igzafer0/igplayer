@@ -199,6 +199,8 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
             setupNowPlayingInfoPanel()
             if(self.autoPlay){
                 play()
+               
+               
             }
             
             self.player?.seek(to: CMTime(seconds: Double(self.initialPosition), preferredTimescale: CMTimeScale(NSEC_PER_SEC)))
@@ -367,6 +369,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
     
     @objc private func play() {
         player?.play()
+        self.flutterEventSink?(["name":"isPlaying","state":true] as [String : Any])
         
     }
     
@@ -374,6 +377,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
         
         player?.pause()
         updateInfoPanelOnPause()
+        self.flutterEventSink?(["name":"isPlaying","state":false] as [String : Any])
         
         
     }

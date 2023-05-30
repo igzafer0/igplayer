@@ -60,6 +60,9 @@ class VideoPlayerBridge {
       case "playerDuration":
         controller.playerDuration = event["duration"];
         break;
+      case "isPlaying":
+        controller.isPlaying = event["state"];
+        break;
     }
   }
 }

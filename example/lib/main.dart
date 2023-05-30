@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:igplayer/igplayer.dart';
 import 'package:igplayer/manage/igplayer_controller.dart';
 import 'package:igplayer/view/ig_video_player.dart';
 
@@ -56,7 +57,7 @@ class _MyAppState extends State<MyApp> {
                 }),
             GestureDetector(
                 onTap: () {
-                  igPlayerController.play();
+                  igPlayerController.isPlaying == true ? igPlayerController.pause() : igPlayerController.play();
                 },
                 child: Container(width: 100, height: 100, color: Colors.blue)),
             GestureDetector(

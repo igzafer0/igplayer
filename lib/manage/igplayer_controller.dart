@@ -1,17 +1,21 @@
+// ignore_for_file: constant_identifier_names, camel_case_types
+
 import 'dart:async';
 import 'package:igplayer/manage/video_player_bridge.dart';
 
 class IgPlayerController {
   StreamController<int> playerTimeListener = StreamController<int>();
   int playerDuration = 0;
+  // ignore: non_constant_identifier_names
+  bool isPlaying = false;
 
-  late VideoPlayerBridge bridge;
+  late VideoPlayerBridge _bridge;
   IgPlayerController() {
     playerTimeListener.add(0);
   }
 
   initBridge(VideoPlayerBridge bridge) {
-    this.bridge = bridge;
+    _bridge = bridge;
   }
 
   ///Updates your player position with `newPosition`
@@ -22,7 +26,7 @@ class IgPlayerController {
   /// ```
   /// And that's it. Your player will now jump to the first second.
   void newPosition(int newPosition) {
-    bridge.newPosition(newPosition);
+    _bridge.newPosition(newPosition);
   }
 
   ///It will skip forward or backward by the given parameter.
@@ -33,24 +37,24 @@ class IgPlayerController {
   /// ```
   ///It will go back by 1 second.
   void skip(int skipPosition) {
-    bridge.skip(skipPosition);
+    _bridge.skip(skipPosition);
   }
 
   void play() {
-    bridge.play();
+    _bridge.play();
   }
 
   void pause() {
-    bridge.pause();
+    _bridge.pause();
   }
 
   ///1.0 is default speed 2.0 is 2x speed and 0.25 is 0.25 speed.
   ///No difference between negative or positive value
   void changeSpeed(double speed) {
-    bridge.changeSpeed(speed);
+    _bridge.changeSpeed(speed);
   }
 
   void dispose() {
-    bridge.dispose();
+    _bridge.dispose();
   }
 }
