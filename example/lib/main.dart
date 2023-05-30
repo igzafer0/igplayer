@@ -76,6 +76,7 @@ class _MyAppState extends State<MyApp> {
                 title: title,
                 subTitle: "TEST2",
                 autoPlay: false,
+                initialPosition: 35,
                 igPlayerController: igPlayerController,
                 artworkUrl:
                     "https://i.discogs.com/_EqNbST80njT5rTLt3Ewq2uga8y0ciG9Ax02m2ea90k/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTExMjY4/NjktMTU4OTc1MjQ0/My04ODI1LmpwZWc.jpeg",

@@ -30,7 +30,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
     var artworkUrl:String = ""
     var title:String = ""
     var subtitle:String = ""
-    
+    var initialPosition:Int = 0
     
     
     
@@ -78,6 +78,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
         self.artworkUrl = parsedData["artworkUrl"] as! String
         self.title = parsedData["title"] as! String
         self.subtitle = parsedData["subtitle"] as! String
+        self.initialPosition = parsedData["initialPosition"] as! Int
         
         setupPlayer()
     }
@@ -200,7 +201,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
                 play()
             }
             
-            
+            self.player?.seek(to: CMTime(seconds: Double(self.initialPosition), preferredTimescale: CMTimeScale(NSEC_PER_SEC)))
             let viewController = (UIApplication.shared.delegate?.window??.rootViewController)!
             viewController.addChild(self.playerViewController!)
         }
@@ -219,6 +220,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
                 let asset = AVAsset(url: videoURL)
                 let playerItem = AVPlayerItem(asset: asset, automaticallyLoadedAssetKeys: requiredAssetKeys)
                 p.replaceCurrentItem(with: playerItem)
+                p.seek(to: CMTime(seconds: Double(self.initialPosition), preferredTimescale: CMTimeScale(NSEC_PER_SEC)))
                 setupRemoteTransportControls()
                 setupNowPlayingInfoPanel()
                 
