@@ -199,7 +199,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
             setupNowPlayingInfoPanel()
             if(self.autoPlay){
                 play()
-               
+                self.flutterEventSink?(["name":"isPlaying","state":true] as [String : Any])
                
             }
             
@@ -377,7 +377,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
         
         player?.pause()
         updateInfoPanelOnPause()
-        self.flutterEventSink?(["name":"isPlaying","state":false] as [String : Any])
+        self.flutterEventSink?(["name":"isPlaying","state":true] as [String : Any])
         
         
     }

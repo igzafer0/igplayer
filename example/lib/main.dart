@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:igplayer/igplayer.dart';
 import 'package:igplayer/manage/igplayer_controller.dart';
 import 'package:igplayer/view/ig_video_player.dart';
 
