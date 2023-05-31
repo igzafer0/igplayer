@@ -39,6 +39,7 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
             exoPlayer!!.seekTo(exoPlayer!!.currentPosition + (newPosition.toLong() * 1000))
         }
     }
+    var innerPlayer:ExoPlayer?=null
     fun newPosition(newPosition: Int) {
         exoPlayer!!.seekTo(newPosition.toLong() * 1000)
     }
@@ -72,7 +73,12 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
         videoNotificationManager =
             VideoNotificationManager(context,  this, activity!!)
         videoNotificationManager!!.init()
+        if (exoPlayer != null) {
 
+            exoPlayer?.release();
+        }
+
+        exoPlayer = innerPlayer
     }
 
     private fun initChannel() {
@@ -110,9 +116,9 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
 
 
     private fun initPlayer() {
-        exoPlayer = ExoPlayer.Builder(context!!).setUseLazyPreparation(true).build()
+        innerPlayer = ExoPlayer.Builder(context!!).setUseLazyPreparation(true).build()
 
-        player = exoPlayer
+        player = innerPlayer
         val dataSourceFactory: DataSource.Factory = DefaultDataSource.Factory(context!!)
 
         val videoSource: MediaSource
@@ -124,14 +130,14 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
             )
         }
 
-        exoPlayer!!.setMediaSource(videoSource)
-        exoPlayer!!.prepare()
-        if(autoPlay){
-            exoPlayer!!.playWhenReady = true
-        }
-        exoPlayer!!.seekTo((initialPosition*1000).toLong());
+        innerPlayer!!.setMediaSource(videoSource)
+        innerPlayer!!.prepare()
+
+        innerPlayer!!.playWhenReady = autoPlay
+
+        innerPlayer!!.seekTo((initialPosition*1000).toLong());
         useController = false
-        exoPlayer!!.addAnalyticsListener(object : AnalyticsListener {
+        innerPlayer!!.addAnalyticsListener(object : AnalyticsListener {
             override fun onIsPlayingChanged(eventTime: AnalyticsListener.EventTime, isPlaying: Boolean) {
                 videoNotificationManager!!.updateNotification()
                 super.onIsPlayingChanged(eventTime, isPlaying)
@@ -158,16 +164,16 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
         val handler = Handler(Looper.getMainLooper())
         val runnable: Runnable = object : Runnable {
             override fun run() {
-                if ((exoPlayer!!.currentPosition / 1000).toInt() != oldTime) {
+                if ((innerPlayer!!.currentPosition / 1000).toInt() != oldTime) {
                     val message = JSONObject()
-                    oldTime = (exoPlayer!!.currentPosition / 1000).toInt()
+                    oldTime = (innerPlayer!!.currentPosition / 1000).toInt()
                     message.put("name", "playerTime")
-                    message.put("time", (exoPlayer!!.currentPosition / 1000).toInt())
+                    message.put("time", (innerPlayer!!.currentPosition / 1000).toInt())
                     eventSink?.success(message)
 
                     val durationMessage = JSONObject()
                     durationMessage.put("name", "playerDuration")
-                    durationMessage.put("duration", (exoPlayer!!.duration / 1000).toInt())
+                    durationMessage.put("duration", (innerPlayer!!.duration / 1000).toInt())
                     eventSink?.success(durationMessage)
 
                 }
@@ -196,11 +202,11 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
         videoSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(
             MediaItem.fromUri(url)
         ) }
-        exoPlayer!!.setMediaSource(videoSource)
-        exoPlayer!!.prepare()
+        innerPlayer!!.setMediaSource(videoSource)
+        innerPlayer!!.prepare()
 
         if (autoPlay){
-            exoPlayer!!.play()
+            innerPlayer!!.play()
             val playerState = JSONObject()
             playerState.put("name", "isPlaying")
             playerState.put("state", true)
@@ -210,18 +216,19 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
 
     }
     fun changeSpeed(speed:Double){
-        exoPlayer!!.setPlaybackSpeed(abs(speed.toFloat()))
+        innerPlayer!!.setPlaybackSpeed(abs(speed.toFloat()))
     }
     override fun onDestroy() {
         try {
-            exoPlayer!!.stop()
+            innerPlayer!!.stop()
             val playerState = JSONObject()
             playerState.put("name", "isPlaying")
             playerState.put("state", false)
             eventSink?.success(playerState)
-            exoPlayer!!.release()
+            innerPlayer!!.release()
             videoNotificationManager!!.doUnbindMediaNotificationManagerService()
             videoNotificationManager!!.cleanPlayerNotification()
+            exoPlayer = null
         } catch (e: Exception) {
         }
 
