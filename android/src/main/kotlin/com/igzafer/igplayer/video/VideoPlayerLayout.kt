@@ -41,7 +41,7 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
     }
     var innerPlayer:ExoPlayer?=null
     fun newPosition(newPosition: Int) {
-        exoPlayer!!.seekTo(newPosition.toLong() * 1000)
+        innerPlayer!!.seekTo(newPosition.toLong() * 1000)
     }
 
     private var eventSink: EventSink? = null
@@ -98,7 +98,7 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
 
     fun playVideo() {
 
-        exoPlayer!!.play()
+        innerPlayer!!.play()
         val playerState = JSONObject()
         playerState.put("name", "isPlaying")
         playerState.put("state", true)
@@ -106,7 +106,7 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
     }
     fun pauseVideo() {
 
-        exoPlayer!!.pause()
+        innerPlayer!!.pause()
         val playerState = JSONObject()
         playerState.put("name", "isPlaying")
         playerState.put("state", false)
