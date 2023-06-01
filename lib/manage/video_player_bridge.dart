@@ -42,6 +42,10 @@ class VideoPlayerBridge {
     methodChannel.invokeMethod("changeSpeed", speed);
   }
 
+  void changeVolume(double volume) {
+    methodChannel.invokeMethod("changeVolume", volume);
+  }
+
   void dispose() {
     methodChannel.invokeMethod("dispose");
   }

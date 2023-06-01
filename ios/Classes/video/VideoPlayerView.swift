@@ -111,6 +111,9 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
                 self.newPosition(newPosition: call.arguments as! Int)
             }else if ("skipPosition" == call.method) {
                 self.skipPosition(skipPosition: call.arguments as! Int )
+            }else if ("changeVolume" == call.method) {
+                self.volume = Float(truncating: call.arguments as! NSNumber)
+                self.changeVolume()
             }else if("mediaChanged" == call.method){
                 self.pause()
                 let parsedData = call.arguments as! [String: Any]
@@ -119,7 +122,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
                 self.onMediaChanged()
                 result(true)
             }else if("changeSpeed" == call.method){
-
+            
                 self.speed = call.arguments as! Float
                 self.changeSpeed()
             }
@@ -132,7 +135,9 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
             else { result(FlutterMethodNotImplemented) }
         })
     }
-    
+    func changeVolume(){
+        self.player?.volume=self.volume
+    }
     func setupPlayer(){
         
         if let videoURL = URL(string: self.url.trimmingCharacters(in: .whitespacesAndNewlines)) {

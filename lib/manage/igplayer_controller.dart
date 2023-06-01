@@ -54,6 +54,10 @@ class IgPlayerController {
     _bridge.changeSpeed(speed);
   }
 
+  void changeVolume(double volume) {
+    _bridge.changeVolume(volume);
+  }
+
   void dispose() {
     _bridge.dispose();
   }

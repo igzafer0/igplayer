@@ -77,6 +77,8 @@ class _IgVideoPlayerState extends State<IgVideoPlayer> {
 
   @override
   void didUpdateWidget(covariant IgVideoPlayer oldWidget) {
+    debugPrint("test ${oldWidget.volume} : ${widget.volume}");
+
     if (oldWidget.videoUrl != widget.videoUrl) {
       _mediaChanged();
     }

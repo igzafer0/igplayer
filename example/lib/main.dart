@@ -26,6 +26,7 @@ class _MyAppState extends State<MyApp> {
     " https://player.vimeo.com/external/830090120.m3u8?s=68861329fcf56f2eae4dad8b031b9d5b7bf14fdb&oauth2_token_id=1669343673",
   ];
   String title = "oynamış";
+  double volume = 1;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -66,7 +67,11 @@ class _MyAppState extends State<MyApp> {
                 child: Container(width: 100, height: 100, color: Colors.red)),
             GestureDetector(
                 onTap: () {
-                  igPlayerController.changeSpeed(2);
+                  setState(() {
+                    volume = volume == 0 ? 1 : 0;
+                    igPlayerController.changeVolume(volume);
+                    debugPrint("volume $volume");
+                  });
                 },
                 child: Container(width: 100, height: 100, color: Colors.green)),
             SizedBox(
@@ -76,7 +81,7 @@ class _MyAppState extends State<MyApp> {
                 title: title,
                 subTitle: "TEST2",
                 autoPlay: false,
-                volume: 0,
+                volume: volume,
                 initialPosition: 35,
                 igPlayerController: igPlayerController,
                 artworkUrl:
