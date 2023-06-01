@@ -11,13 +11,14 @@ class VideoPlayerBridge {
     methodChannel = const MethodChannel("igzafer/NativeVideoPlayerMethodChannel");
   }
 
-  void mediaChanged(String videoUrl, String title, String subtitle, String artworkUrl, bool autoPlay) {
+  void mediaChanged(String videoUrl, String title, String subtitle, String artworkUrl, bool autoPlay, double volume) {
     methodChannel.invokeMethod("mediaChanged", {
       "url": videoUrl,
       "title": title,
       "subtitle": subtitle,
       "artworkUrl": artworkUrl,
       "autoPlay": autoPlay,
+      "volume": volume
     });
   }
 

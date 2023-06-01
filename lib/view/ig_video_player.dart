@@ -14,6 +14,7 @@ class IgVideoPlayer extends StatefulWidget {
     this.title = "IgPlayer",
     this.subTitle = "Something Playing",
     this.initialPosition = 0,
+    this.volume = 1.0,
     Key? key,
   }) : super(key: key);
   final String videoUrl;
@@ -23,7 +24,7 @@ class IgVideoPlayer extends StatefulWidget {
   final String title;
   final String subTitle;
   final int initialPosition;
-
+  final double volume;
   @override
   State<IgVideoPlayer> createState() => _IgVideoPlayerState();
 }
@@ -93,6 +94,7 @@ class _IgVideoPlayerState extends State<IgVideoPlayer> {
         "title": widget.title,
         "subtitle": widget.subTitle,
         "initialPosition": widget.initialPosition,
+        "volume": widget.volume,
       },
       onPlatformViewCreated: (id) {
         videoPlayerBridge.listenPlayerEvents();
@@ -102,6 +104,7 @@ class _IgVideoPlayerState extends State<IgVideoPlayer> {
   }
 
   void _mediaChanged() {
-    videoPlayerBridge.mediaChanged(widget.videoUrl, widget.title, widget.subTitle, widget.artworkUrl, widget.autoPlay);
+    videoPlayerBridge.mediaChanged(
+        widget.videoUrl, widget.title, widget.subTitle, widget.artworkUrl, widget.autoPlay, widget.volume);
   }
 }
