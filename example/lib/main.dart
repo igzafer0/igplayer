@@ -16,6 +16,8 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   void initState() {
+    WidgetsFlutterBinding.ensureInitialized();
+
     super.initState();
   }
 
@@ -23,7 +25,7 @@ class _MyAppState extends State<MyApp> {
   int index = 0;
   var list = [
     "https://player.vimeo.com/progressive_redirect/playback/788609312/rendition/720p/file.mp4?loc=external&oauth2_token_id=1669343316&signature=11c76e88b0868c8bf5119c752406dc0ee9d278eda5cf21db204bc588697f3cd4",
-    " https://player.vimeo.com/external/830090120.m3u8?s=68861329fcf56f2eae4dad8b031b9d5b7bf14fdb&oauth2_token_id=1669343673",
+    "https://player.vimeo.com/external/830090120.m3u8?s=68861329fcf56f2eae4dad8b031b9d5b7bf14fdb&oauth2_token_id=1669343673",
   ];
   String title = "oynamış";
   double volume = 1;
@@ -57,11 +59,14 @@ class _MyAppState extends State<MyApp> {
                 }),
             GestureDetector(
                 onTap: () {
+                  igPlayerController.enablePip(false);
                   igPlayerController.isPlaying == true ? igPlayerController.pause() : igPlayerController.play();
                 },
                 child: Container(width: 100, height: 100, color: Colors.blue)),
             GestureDetector(
                 onTap: () {
+                  igPlayerController.enablePip(true);
+
                   igPlayerController.newPosition(1);
                 },
                 child: Container(width: 100, height: 100, color: Colors.red)),
@@ -79,6 +84,9 @@ class _MyAppState extends State<MyApp> {
               child: IgVideoPlayer(
                 videoUrl: list[index],
                 title: title,
+                initialValues: (controller) {
+                  controller.changeSpeed(2);
+                },
                 subTitle: "TEST2",
                 autoPlay: false,
                 volume: volume,

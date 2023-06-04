@@ -58,6 +58,12 @@ class IgPlayerController {
     _bridge.changeVolume(volume);
   }
 
+  ///only ios, turn on or off pip mode
+  void enablePip(bool enablePip) {
+    _bridge.enablePip(enablePip);
+  }
+
+  ///dont forget
   void dispose() {
     _bridge.dispose();
   }

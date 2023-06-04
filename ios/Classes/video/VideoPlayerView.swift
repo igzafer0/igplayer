@@ -32,6 +32,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
     var subtitle:String = ""
     var initialPosition:Int = 0
     var volume:Float = 1
+    var enablePip:Bool = false
     
     
     
@@ -81,12 +82,13 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
         self.subtitle = parsedData["subtitle"] as! String
         self.initialPosition = parsedData["initialPosition"] as! Int
         self.volume = Float(truncating: parsedData["volume"] as! NSNumber)
+
         setupPlayer()
     }
     
     private func setupEventChannel(viewId: Int64, messenger:FlutterBinaryMessenger, instance:VideoPlayerView) {
         
-        instance.eventChannel = FlutterEventChannel(name: "igzafer/NativeVideoPlayerEventChannel" , binaryMessenger: messenger, codec: FlutterJSONMethodCodec.sharedInstance())
+        instance.eventChannel = FlutterEventChannel(name: "igzafer/NativeVideoPlayerEventChannel"+String(viewId) , binaryMessenger: messenger, codec: FlutterJSONMethodCodec.sharedInstance())
         
         instance.eventChannel!.setStreamHandler(instance)
         self.flutterEventSink?(["name":"created"])
@@ -95,7 +97,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
     
     private func setupMethodChannel(viewId: Int64, messenger:FlutterBinaryMessenger) {
         
-        let nativeMethodsChannel = FlutterMethodChannel(name: "igzafer/NativeVideoPlayerMethodChannel", binaryMessenger: messenger);
+        let nativeMethodsChannel = FlutterMethodChannel(name: "igzafer/NativeVideoPlayerMethodChannel"+String(viewId), binaryMessenger: messenger);
         
         nativeMethodsChannel.setMethodCallHandler({
             (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
@@ -130,7 +132,18 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
                 self.dispose()
                 result(true)
             }
-            
+            else if("enablePip"==call.method){
+                self.enablePip=call.arguments as! Bool
+                self.playerViewController?.allowsPictureInPicturePlayback = self.enablePip
+                if(self.enablePip){
+                    if #available(iOS 14.2, *) {
+                    if AVPictureInPictureController.isPictureInPictureSupported() {
+                        self.playerViewController?.canStartPictureInPictureAutomaticallyFromInline = true
+                    }
+                }
+                }
+                
+            }
             
             else { result(FlutterMethodNotImplemented) }
         })
@@ -194,12 +207,10 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
             self.playerViewController?.player = self.player
             self.playerViewController?.view.frame = self.frame
             self.playerViewController?.showsPlaybackControls = false
-            self.playerViewController?.allowsPictureInPicturePlayback = true
-            if #available(iOS 14.2, *) {
-                if AVPictureInPictureController.isPictureInPictureSupported() {
-                    self.playerViewController?.canStartPictureInPictureAutomaticallyFromInline = true
-                }
-            }
+            
+         
+          
+           
             
             setupRemoteTransportControls()
             

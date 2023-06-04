@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -6,7 +8,7 @@ import 'package:igplayer/manage/igplayer_controller.dart';
 import 'package:igplayer/manage/video_player_bridge.dart';
 
 class IgVideoPlayer extends StatefulWidget {
-  const IgVideoPlayer({
+  IgVideoPlayer({
     required this.videoUrl,
     required this.igPlayerController,
     this.autoPlay = false,
@@ -15,16 +17,19 @@ class IgVideoPlayer extends StatefulWidget {
     this.subTitle = "Something Playing",
     this.initialPosition = 0,
     this.volume = 1.0,
+    required this.initialValues,
     Key? key,
   }) : super(key: key);
   final String videoUrl;
   final IgPlayerController igPlayerController;
   final bool autoPlay;
   final String artworkUrl;
+  void Function(IgPlayerController controller) initialValues;
   final String title;
   final String subTitle;
   final int initialPosition;
   final double volume;
+
   @override
   State<IgVideoPlayer> createState() => _IgVideoPlayerState();
 }
@@ -34,8 +39,6 @@ class _IgVideoPlayerState extends State<IgVideoPlayer> {
   @override
   void initState() {
     super.initState();
-    videoPlayerBridge = VideoPlayerBridge(widget.igPlayerController);
-    widget.igPlayerController.initBridge(videoPlayerBridge);
   }
 
   @override
@@ -69,7 +72,9 @@ class _IgVideoPlayerState extends State<IgVideoPlayer> {
         "initialPosition": widget.initialPosition,
       },
       onPlatformViewCreated: (id) {
-        videoPlayerBridge.listenPlayerEvents();
+        videoPlayerBridge = VideoPlayerBridge(widget.igPlayerController, id);
+        widget.igPlayerController.initBridge(videoPlayerBridge);
+        videoPlayerBridge.listenPlayerEvents(id);
       },
       creationParamsCodec: const JSONMessageCodec(),
     );
@@ -99,7 +104,10 @@ class _IgVideoPlayerState extends State<IgVideoPlayer> {
         "volume": widget.volume,
       },
       onPlatformViewCreated: (id) {
-        videoPlayerBridge.listenPlayerEvents();
+        videoPlayerBridge = VideoPlayerBridge(widget.igPlayerController, id);
+        widget.igPlayerController.initBridge(videoPlayerBridge);
+        videoPlayerBridge.listenPlayerEvents(id);
+        widget.initialValues(widget.igPlayerController);
       },
       creationParamsCodec: const JSONMessageCodec(),
     );

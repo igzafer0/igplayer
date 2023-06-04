@@ -7,8 +7,8 @@ class VideoPlayerBridge {
   final IgPlayerController controller;
   late MethodChannel methodChannel;
   late EventChannel eventChannel;
-  VideoPlayerBridge(this.controller) {
-    methodChannel = const MethodChannel("igzafer/NativeVideoPlayerMethodChannel");
+  VideoPlayerBridge(this.controller, viewId) {
+    methodChannel = MethodChannel("igzafer/NativeVideoPlayerMethodChannel$viewId");
   }
 
   void mediaChanged(String videoUrl, String title, String subtitle, String artworkUrl, bool autoPlay, double volume) {
@@ -46,12 +46,16 @@ class VideoPlayerBridge {
     methodChannel.invokeMethod("changeVolume", volume);
   }
 
+  void enablePip(bool enablePip) {
+    methodChannel.invokeMethod("enablePip", enablePip);
+  }
+
   void dispose() {
     methodChannel.invokeMethod("dispose");
   }
 
-  Future<void> listenPlayerEvents() async {
-    eventChannel = const EventChannel("igzafer/NativeVideoPlayerEventChannel", JSONMethodCodec());
+  Future<void> listenPlayerEvents(id) async {
+    eventChannel = EventChannel("igzafer/NativeVideoPlayerEventChannel$id", const JSONMethodCodec());
     eventChannel.receiveBroadcastStream([]).listen(_listenEvents);
   }
 
