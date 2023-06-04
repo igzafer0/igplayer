@@ -216,7 +216,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
             
             setupNowPlayingInfoPanel()
             if(self.autoPlay){
-                self.flutterEventSink?(["name":"isPlaying","state":true] as [String : Any])
+               
                 play()
                
             }
@@ -233,6 +233,7 @@ class VideoPlayerView: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPla
     
     private func changeSpeed(){
         player?.rate = self.speed
+        self.play()
     }
     private func onMediaChanged() {
         if let p = self.player {

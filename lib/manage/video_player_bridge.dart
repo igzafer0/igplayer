@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:igplayer/manage/igplayer_controller.dart';
 
@@ -55,6 +56,8 @@ class VideoPlayerBridge {
   }
 
   Future<void> listenPlayerEvents(id) async {
+    debugPrint("testo $id");
+
     eventChannel = EventChannel("igzafer/NativeVideoPlayerEventChannel$id", const JSONMethodCodec());
     eventChannel.receiveBroadcastStream([]).listen(_listenEvents);
   }
@@ -68,7 +71,7 @@ class VideoPlayerBridge {
         controller.playerDuration = event["duration"];
         break;
       case "isPlaying":
-        controller.isPlaying = event["state"];
+        controller.isPlaying.add(event["state"]);
         break;
     }
   }

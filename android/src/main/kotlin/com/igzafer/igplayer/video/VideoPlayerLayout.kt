@@ -48,17 +48,18 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
     private var activity: Activity? = null
     private var context: Context? = null
     private var messenger: BinaryMessenger? = null
-
+    private var viewId: Int? = null
 
     private var videoNotificationManager: VideoNotificationManager? = null
 
     constructor(context: Context?) : super(context!!)
     constructor(
-        context: Context, activity: Activity?, messenger: BinaryMessenger?, arguments: Any?
+        context: Context, activity: Activity?,id:Int, messenger: BinaryMessenger?, arguments: Any?
     ) : super(context) {
         this.activity = activity
         this.context = context
         this.messenger = messenger
+        this.viewId=id;
 
         val args = arguments as JSONObject
         url = args.getString("url")
@@ -82,9 +83,8 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
     }
 
     private fun initChannel() {
-        EventChannel(
-            messenger, "igzafer/NativeVideoPlayerEventChannel", JSONMethodCodec.INSTANCE
-        ).setStreamHandler(this)
+
+
 
     }
 
@@ -97,20 +97,12 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
     }
 
     fun playVideo() {
-
         innerPlayer!!.play()
-        val playerState = JSONObject()
-        playerState.put("name", "isPlaying")
-        playerState.put("state", true)
-        eventSink?.success(playerState)
+
     }
     fun pauseVideo() {
-
         innerPlayer!!.pause()
-        val playerState = JSONObject()
-        playerState.put("name", "isPlaying")
-        playerState.put("state", false)
-        eventSink?.success(playerState)
+
     }
 
 
@@ -139,6 +131,11 @@ class VideoPlayerLayout : StyledPlayerView, IPlayer, EventChannel.StreamHandler 
         useController = false
         innerPlayer!!.addAnalyticsListener(object : AnalyticsListener {
             override fun onIsPlayingChanged(eventTime: AnalyticsListener.EventTime, isPlaying: Boolean) {
+                Log.d("winter","test $isPlaying")
+                val playerState = JSONObject()
+                playerState.put("name", "isPlaying")
+                playerState.put("state", isPlaying)
+                eventSink?.success(playerState)
                 videoNotificationManager!!.updateNotification()
                 super.onIsPlayingChanged(eventTime, isPlaying)
             }

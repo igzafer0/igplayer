@@ -1,13 +1,14 @@
 // ignore_for_file: constant_identifier_names, camel_case_types
 
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:igplayer/manage/video_player_bridge.dart';
 
 class IgPlayerController {
   StreamController<int> playerTimeListener = StreamController<int>();
   int playerDuration = 0;
   // ignore: non_constant_identifier_names
-  bool isPlaying = false;
+  StreamController<bool> isPlaying = StreamController<bool>();
 
   late VideoPlayerBridge _bridge;
   IgPlayerController() {
@@ -45,6 +46,7 @@ class IgPlayerController {
   }
 
   void pause() {
+    debugPrint("tetiklendi");
     _bridge.pause();
   }
 

@@ -75,6 +75,7 @@ class _IgVideoPlayerState extends State<IgVideoPlayer> {
         videoPlayerBridge = VideoPlayerBridge(widget.igPlayerController, id);
         widget.igPlayerController.initBridge(videoPlayerBridge);
         videoPlayerBridge.listenPlayerEvents(id);
+        widget.initialValues(widget.igPlayerController);
       },
       creationParamsCodec: const JSONMessageCodec(),
     );

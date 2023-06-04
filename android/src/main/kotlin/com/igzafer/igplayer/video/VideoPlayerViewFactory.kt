@@ -18,7 +18,7 @@ class VideoPlayerViewFactory(
 
 
     override fun create(context: Context, id: Int, args: Any?): PlatformView {
-        videoPlayerView = VideoPlayerView(context, activity, binaryMessenger, args)
+        videoPlayerView = VideoPlayerView(context, activity,id, binaryMessenger, args)
         return videoPlayerView!!
     }
 

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:igplayer/manage/igplayer_controller.dart';
 import 'package:igplayer/view/ig_video_player.dart';
@@ -27,6 +29,7 @@ class _MyAppState extends State<MyApp> {
     "https://player.vimeo.com/progressive_redirect/playback/788609312/rendition/720p/file.mp4?loc=external&oauth2_token_id=1669343316&signature=11c76e88b0868c8bf5119c752406dc0ee9d278eda5cf21db204bc588697f3cd4",
     "https://player.vimeo.com/external/830090120.m3u8?s=68861329fcf56f2eae4dad8b031b9d5b7bf14fdb&oauth2_token_id=1669343673",
   ];
+  bool isPlaying = false;
   String title = "oynamış";
   double volume = 1;
   @override
@@ -45,6 +48,15 @@ class _MyAppState extends State<MyApp> {
         body: Column(
           children: [
             StreamBuilder(
+                stream: igPlayerController.isPlaying.stream,
+                builder: (context, d) {
+                  if (d.data != null) {
+                    isPlaying = d.data!;
+                    return Text("isPlaying: ${d.data}");
+                  }
+                  return Container();
+                }),
+            StreamBuilder(
                 stream: igPlayerController.playerTimeListener.stream,
                 builder: (context, stream) {
                   if (stream.data != null) {
@@ -60,7 +72,7 @@ class _MyAppState extends State<MyApp> {
             GestureDetector(
                 onTap: () {
                   igPlayerController.enablePip(false);
-                  igPlayerController.isPlaying == true ? igPlayerController.pause() : igPlayerController.play();
+                  isPlaying == true ? igPlayerController.pause() : igPlayerController.play();
                 },
                 child: Container(width: 100, height: 100, color: Colors.blue)),
             GestureDetector(
@@ -84,9 +96,7 @@ class _MyAppState extends State<MyApp> {
               child: IgVideoPlayer(
                 videoUrl: list[index],
                 title: title,
-                initialValues: (controller) {
-                  controller.changeSpeed(2);
-                },
+                initialValues: (controller) {},
                 subTitle: "TEST2",
                 autoPlay: false,
                 volume: volume,
@@ -101,4 +111,6 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
+
+  void listener() {}
 }
