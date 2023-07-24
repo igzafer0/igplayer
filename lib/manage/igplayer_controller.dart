@@ -1,7 +1,6 @@
 // ignore_for_file: constant_identifier_names, camel_case_types
 
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:igplayer/manage/video_player_bridge.dart';
 
 class IgPlayerController {
