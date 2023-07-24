@@ -1,8 +1,9 @@
-name: igplayer_example
-description: Demonstrates how to use the igplayer plugin.
+name: IgPlayer
+description: A video player for flutter by Zafer Cetin.
+author: Zafer Çetin<zaferkurumsal@gmail.com>
+homepage: https://github.com/igzafer0/igplayer
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 environment:
   sdk: '>=2.19.6 <3.0.0'
