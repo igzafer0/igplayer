@@ -1,0 +1,30 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  package="com.igzafer.igplayer">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+
+
+<application>
+    <service
+        android:name=".NotificationManagerService"
+        android:exported="false"
+        android:stopWithTask="false">
+    </service>
+    <receiver
+
+        android:name=".video.VideoNotificationReceiver"
+        android:exported="true">
+        <intent-filter>
+            <action android:name="android.intent.action.MEDIA_BUTTON" />
+        </intent-filter>
+    </receiver>
+    <receiver
+
+        android:name=".video.VideoNotificationDeleteReceiver"
+        android:exported="true">
+
+    </receiver>
+</application>
+</manifest>

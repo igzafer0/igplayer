@@ -1,0 +1,57 @@
+group 'com.igzafer.igplayer'
+version '1.0.0'
+
+buildscript {
+    ext.kotlin_version = '1.7.10'
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.2.2'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+android {
+    compileSdkVersion 31
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    defaultConfig {
+        multiDexEnabled true
+        minSdkVersion 16
+    }
+}
+dependencies {
+    implementation 'com.google.android.exoplayer:exoplayer:2.18.6'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "androidx.media:media:1.6.0"
+    implementation 'com.github.bumptech.glide:glide:4.12.0'
+    implementation 'com.android.support:multidex:1.0.3'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
+}
+
